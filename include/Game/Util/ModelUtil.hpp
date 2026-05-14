@@ -28,6 +28,7 @@ namespace MR {
     void initEnvelopeAndEnvMapOrProjMapModelData(J3DModelData*);
 
     ResTIMG* getResTIMG(const LiveActor*, int);
+    ResTIMG* getResTIMG(const J3DModelData*, int);
 
     void downFracVtx(J3DModelData*);
 
@@ -48,7 +49,11 @@ namespace MR {
     void showMaterial(J3DModel*, const char*);
     void showMaterial(const LiveActor*, const char*);
 
+    void calcFogStartEnd(TVec3f, f32, f32*, f32*);
+
     bool isUseTex(J3DMaterial*, u16);
+    bool isNormalTexMtx(J3DMaterial*);
+    bool isUseTexMtx(J3DMaterial*, u32);
 
     void updateMaterial(LiveActor*);
 
@@ -59,7 +64,6 @@ namespace MR {
     void copyJointAnimation(LiveActor*, const LiveActor*);
 
     void calcModelBoundingBox(TBox3f*, const LiveActor*);
-
     void calcModelBoundingRadius(f32*, const LiveActor*);
 
     bool isExistCollisionResource(const LiveActor*, const char*);

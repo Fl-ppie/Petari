@@ -12,7 +12,9 @@
 #include "JSystem/J3DGraphAnimator/J3DModelData.hpp"
 #include "JSystem/J3DGraphBase/J3DMaterial.hpp"
 #include "JSystem/J3DGraphBase/J3DPacket.hpp"
+#include "JSystem/J3DGraphBase/J3DSys.hpp"
 #include "JSystem/JUtility/JUTNameTab.hpp"
+#include "revolution/mtx.h"
 #include "revolution/os/OSMutex.h"
 
 namespace {
@@ -170,6 +172,42 @@ namespace MR {
     void showMaterial(const LiveActor* pActor, const char* pName) {
         showMaterial(MR::getJ3DModel(pActor), pName);
     }
+
+    void calcFogStartEnd(TVec3f vec, f32 value, f32* pStart, f32* pEnd) {
+        TVec3f out;
+        PSMTXMultVec(j3dSys.mViewMtx, &vec, &out);
+        out.z = -out.z;
+        if (value == 0.0f) {
+            *pStart = out.z;
+            *pEnd = 10000.0f;
+        } else {
+            f32 start = 100.0f + (out.z - 100.0f) / value;
+            f32 end = 100.0f;
+
+            if (10000.0f > start) {
+                end = out.z - (10000.0f - out.z) * (value / (1.0f - value));
+                end = 10000.0f;
+            }
+
+            *pStart = start;
+            *pEnd = end;
+        }
+    }
+
+    bool isUseTex(J3DMaterial* pMaterial, u16 texIdx) {
+        for (u32 idx = 0; idx < 8; idx++) {
+            if (texIdx == pMaterial->mTevBlock->getTexNo(idx)) {
+                for (u32 idx2 = 0; idx2 < pMaterial->mTevBlock->getTevStageNum(); idx2++) {
+                    if (pMaterial->mTevBlock->getTevOrder(idx2)->mTexMap == idx) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
 
     void getLightNum(J3DMaterial* pMaterial, s32* pChan1, s32* pChan2, s32* pChan3, s32* pChan4) {
         for (int i = 0; i < 8; i++) {
