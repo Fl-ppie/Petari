@@ -33,8 +33,8 @@ namespace MR {
 
     void calcJ3DModel(LiveActor*);
 
-    u32 getMaterialNo(J3DModelData*, const char*);
-    u32 getMaterialNo(J3DModel*, const char*);
+    u16 getMaterialNo(J3DModelData*, const char*);
+    u16 getMaterialNo(J3DModel*, const char*);
     J3DMaterial* getMaterial(J3DModelData*, const char*);
     J3DMaterial* getMaterial(J3DModelData*, int);
     J3DMaterial* getMaterial(J3DModel*, int);
@@ -44,9 +44,9 @@ namespace MR {
     void updateModelDiffDL(LiveActor*);
     bool isEnvelope(J3DMaterial*);
     void hideMaterial(J3DModel*, const char*);
-
-    void showMaterial(const LiveActor*, const char*);
     void hideMaterial(const LiveActor*, const char*);
+    void showMaterial(J3DModel*, const char*);
+    void showMaterial(const LiveActor*, const char*);
 
     bool isUseTex(J3DMaterial*, u16);
 
@@ -79,6 +79,8 @@ namespace MR {
     s16 getBrkFrameMax(const LiveActor*, const char*);
     s16 getBvaFrameMax(const LiveActor*, const char*);
     bool isBckPlaying(XanimePlayer*, const char*);
+
+    bool findBckNameStringInResource(const char**, const ResourceHolder*, const char*);
 
     void updateModelManager(LiveActor*);
     void updateModelAnimPlayer(LiveActor*);

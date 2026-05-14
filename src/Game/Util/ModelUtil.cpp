@@ -5,6 +5,7 @@
 #include "Game/LiveActor/LiveActor.hpp"
 #include "Game/System/ResourceHolder.hpp"
 #include "Game/Util/MutexHolder.hpp"
+#include "Game/Util/StringUtil.hpp"
 #include "JSystem/J3DGraphAnimator/J3DJoint.hpp"
 #include "JSystem/J3DGraphAnimator/J3DMaterialAttach.hpp"
 #include "JSystem/J3DGraphAnimator/J3DModel.hpp"
@@ -92,11 +93,32 @@ namespace MR {
         return reinterpret_cast< BckCtrlData* >(MR::getResourceHolder(pActor)->mBvaResTable->getRes(pName))->mStartFrame;
     }
 
-    u32 getMaterialNo(J3DModelData* pModelData, const char* pMaterialName) {
+    bool isBckPlaying(XanimePlayer* pAnimePlayer, const char* pName) {
+        bool isRun = (pAnimePlayer->_24[pAnimePlayer->_54].mState & 1) ? pAnimePlayer->isRun(pName) : false;
+
+        if (isRun && pAnimePlayer->_0C != 0.0f) {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool findBckNameStringInResource(const char** pBckName, const ResourceHolder* pResourceHolder, const char* pName) {
+        for (s32 idx = 0; idx < pResourceHolder->mMotionResTable->mCount; idx++) {
+            if (isEqualStringCase(pName, pResourceHolder->getMotionName(idx))) {
+                *pBckName = pResourceHolder->getMotionName(idx);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    u16 getMaterialNo(J3DModelData* pModelData, const char* pMaterialName) {
         return pModelData->mMaterialTable.mMaterialName->getIndex(pMaterialName);
     }
 
-    u32 getMaterialNo(J3DModel* pModel, const char* pMaterialName) {
+    u16 getMaterialNo(J3DModel* pModel, const char* pMaterialName) {
         return pModel->mModelData->mMaterialTable.mMaterialName->getIndex(pMaterialName);
     }
 
@@ -113,19 +135,40 @@ namespace MR {
         return pModel->mModelData->mMaterialTable.getMaterialNodePointer(idx);
     }
 
-    // getMaterial(const LiveActor *, int)
+    J3DMaterial* getMaterial(const LiveActor* pActor, int idx) {
+        return MR::getJ3DModelData(pActor)->mMaterialTable.getMaterialNodePointer(idx);
+    }
+
+    const char* getMaterialName(const J3DModelData* pModelData, int idx) {
+        return pModelData->mMaterialTable.mMaterialName->getName(idx);
+    }
+
+    void updateModelDiffDL(LiveActor* pActor) {
+        pActor->mModelManager->updateDL(true);
+    }
+
+    bool isEnvelope(J3DMaterial* pMaterial) {
+        return pMaterial->mShape->mHasPNMTXIdx;
+    }
 
     s32 getMaterialNum(J3DModel* pModel) {
         return pModel->mModelData->mMaterialTable.getMaterialNum();
     }
 
-    // updateModelDiffDL
-    // isEnvelope
-
-    // some inlining issue
     void hideMaterial(J3DModel* pModel, const char* pMaterialName) {
-        J3DShapePacket* pckt = pModel->mMatPacket[getMaterialNo(pModel, pMaterialName)].mpShapePacket;
-        pckt->mFlags |= 0x10;
+        pModel->mMatPacket[getMaterialNo(pModel, pMaterialName)].mpShapePacket->mFlags |= 0x10;
+    }
+
+    void hideMaterial(const LiveActor* pActor, const char* pName) {
+        hideMaterial(MR::getJ3DModel(pActor), pName);
+    }
+
+    void showMaterial(J3DModel* pModel, const char* pMaterialName) {
+        pModel->mMatPacket[getMaterialNo(pModel, pMaterialName)].mpShapePacket->mFlags &= 0xFFFFFFEF;
+    }
+
+    void showMaterial(const LiveActor* pActor, const char* pName) {
+        showMaterial(MR::getJ3DModel(pActor), pName);
     }
 
     void getLightNum(J3DMaterial* pMaterial, s32* pChan1, s32* pChan2, s32* pChan3, s32* pChan4) {
