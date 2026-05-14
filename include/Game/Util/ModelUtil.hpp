@@ -16,7 +16,9 @@ class XanimeResourceTable;
 namespace MR {
     void newXanimePlayer(const ResourceHolder*, const char*, const ResourceHolder*, J3DMdlFlag, XanimeResourceTable*);
     XanimeResourceTable* newXanimeResourceTable(ResourceHolder*);
-    
+
+    void invalidateMtxCalc(J3DModelData*);
+
     bool isExistModel(const char*);
 
     J3DModel* getJ3DModel(const LiveActor*);
@@ -79,5 +81,6 @@ namespace MR {
     bool isBckPlaying(XanimePlayer*, const char*);
 
     void updateModelManager(LiveActor*);
+    void updateModelAnimPlayer(LiveActor*);
     void calcAnimModelManager(LiveActor*);
 };  // namespace MR

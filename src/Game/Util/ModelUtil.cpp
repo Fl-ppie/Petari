@@ -1,12 +1,16 @@
 #include "Game/Util/ModelUtil.hpp"
-
+#include "Game/Animation/XanimePlayer.hpp"
 #include "Game/Animation/XanimeResource.hpp"
+#include "Game/LiveActor/LiveActor.hpp"
+#include "Game/Util/MutexHolder.hpp"
+#include "JSystem/J3DGraphAnimator/J3DJoint.hpp"
 #include "JSystem/J3DGraphAnimator/J3DMaterialAttach.hpp"
 #include "JSystem/J3DGraphAnimator/J3DModel.hpp"
 #include "JSystem/J3DGraphAnimator/J3DModelData.hpp"
 #include "JSystem/J3DGraphBase/J3DMaterial.hpp"
 #include "JSystem/J3DGraphBase/J3DPacket.hpp"
 #include "JSystem/JUtility/JUTNameTab.hpp"
+#include "revolution/os/OSMutex.h"
 
 namespace {
     bool isUseLightChanNo(J3DMaterial* pMaterial, int channel, int index) {
@@ -26,6 +30,45 @@ namespace MR {
 
     XanimeResourceTable* newXanimeResourceTable(ResourceHolder* pResourceHolder) {
         return new XanimeResourceTable(pResourceHolder);
+    }
+
+    void updateModelManager(LiveActor* pActor) {
+        pActor->mModelManager->update();
+    }
+
+    void calcAnimModelManager(LiveActor* pActor) {
+        pActor->mModelManager->calcAnim();
+    }
+
+    void updateModelAnimPlayer(LiveActor* pActor) {
+        XanimePlayer* animePlayer = pActor->mModelManager->mXanimePlayer;
+        animePlayer->updateBeforeMovement();
+        animePlayer->updateAfterMovement();
+    }
+
+    void invalidateMtxCalc(J3DModelData* pModelData) {
+        for (u32 idx = 0; idx < pModelData->mJointTree.mJointNum; idx++) {
+            pModelData->mJointTree.mJointNodePointer[idx]->mMtxCalc = nullptr;
+        }
+    }
+
+    void invalidateJointCallback(J3DModelData* pModelData) {
+        for (u32 idx = 0; idx < pModelData->mJointTree.mJointNum; idx++) {
+            pModelData->mJointTree.mJointNodePointer[idx]->mCallBack = nullptr;
+        }
+    }
+
+    J3DModel* getJ3DModel(const LiveActor* pActor) {
+        if (pActor->mModelManager == nullptr) {
+            return nullptr;
+        }
+        return pActor->mModelManager->getJ3DModel();
+    }
+
+    void calcJ3DModel(LiveActor * pActor) {
+        OSLockMutex(&MR::MutexHolder<nullptr>::sMutex);
+        getJ3DModel(pActor)->calc();
+        OSUnlockMutex(&MR::MutexHolder<nullptr>::sMutex);
     }
 
     u32 getMaterialNo(J3DModelData* pModelData, const char* pMaterialName) {
