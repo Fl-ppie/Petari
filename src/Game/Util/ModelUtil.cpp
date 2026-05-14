@@ -1,5 +1,6 @@
 #include "Game/Util/ModelUtil.hpp"
 
+#include "Game/Animation/XanimeResource.hpp"
 #include "JSystem/J3DGraphAnimator/J3DMaterialAttach.hpp"
 #include "JSystem/J3DGraphAnimator/J3DModel.hpp"
 #include "JSystem/J3DGraphAnimator/J3DModelData.hpp"
@@ -20,6 +21,13 @@ namespace {
 }  // namespace
 
 namespace MR {
+    void newXanimePlayer(const ResourceHolder*, const char*, const ResourceHolder*, J3DMdlFlag, XanimeResourceTable*) {
+    }
+
+    XanimeResourceTable* newXanimeResourceTable(ResourceHolder* pResourceHolder) {
+        return new XanimeResourceTable(pResourceHolder);
+    }
+
     u32 getMaterialNo(J3DModelData* pModelData, const char* pMaterialName) {
         return pModelData->mMaterialTable.mMaterialName->getIndex(pMaterialName);
     }
