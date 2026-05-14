@@ -1,7 +1,9 @@
 #include "Game/Util/ModelUtil.hpp"
+#include "Game/Animation/BckCtrl.hpp"
 #include "Game/Animation/XanimePlayer.hpp"
 #include "Game/Animation/XanimeResource.hpp"
 #include "Game/LiveActor/LiveActor.hpp"
+#include "Game/System/ResourceHolder.hpp"
 #include "Game/Util/MutexHolder.hpp"
 #include "JSystem/J3DGraphAnimator/J3DJoint.hpp"
 #include "JSystem/J3DGraphAnimator/J3DMaterialAttach.hpp"
@@ -65,10 +67,29 @@ namespace MR {
         return pActor->mModelManager->getJ3DModel();
     }
 
-    void calcJ3DModel(LiveActor * pActor) {
-        OSLockMutex(&MR::MutexHolder<nullptr>::sMutex);
+    void calcJ3DModel(LiveActor* pActor) {
+        OSLockMutex(&MR::MutexHolder< nullptr >::sMutex);
         getJ3DModel(pActor)->calc();
-        OSUnlockMutex(&MR::MutexHolder<nullptr>::sMutex);
+        OSUnlockMutex(&MR::MutexHolder< nullptr >::sMutex);
+    }
+
+    J3DModelData* getJ3DModelData(const LiveActor* pActor) {
+        if (pActor->mModelManager == nullptr) {
+            return nullptr;
+        }
+        return pActor->mModelManager->getJ3DModelData();
+    }
+
+    s16 getBckFrameMax(const LiveActor* pActor, const char* pName) {
+        return reinterpret_cast< BckCtrlData* >(MR::getResourceHolder(pActor)->mMotionResTable->getRes(pName))->mStartFrame;
+    }
+
+    s16 getBrkFrameMax(const LiveActor* pActor, const char* pName) {
+        return reinterpret_cast< BckCtrlData* >(MR::getResourceHolder(pActor)->mBrkResTable->getRes(pName))->mStartFrame;
+    }
+
+    s16 getBvaFrameMax(const LiveActor* pActor, const char* pName) {
+        return reinterpret_cast< BckCtrlData* >(MR::getResourceHolder(pActor)->mBvaResTable->getRes(pName))->mStartFrame;
     }
 
     u32 getMaterialNo(J3DModelData* pModelData, const char* pMaterialName) {
