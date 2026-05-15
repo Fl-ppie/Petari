@@ -214,8 +214,6 @@ void Penguin::exeReaction() {
 }
 
 void Penguin::exeWait() {
-    // FIXME: check
-
     if (MR::isFirstStep(this)) {
         mStepToDive = MR::getRandom(sStepToDiveMin, sStepToDiveMax);
         if (MR::isExistRail(this)) {
