@@ -19,7 +19,6 @@ namespace MR {
 
     void stopStageBGM(u32);
     void unlockStageBGM();
-    void setNextStageBGM(const char*);
 
     void startLastStageBGM();
 
