@@ -8906,12 +8906,12 @@ Game/System/GameEventFlagChecker.cpp:
 
 Game/System/GameEventFlagStorage.cpp:
 	.text       start:0x803B52B0 end:0x803B55E0
-	.data       start:0x805DF928 end:0x805DFB60
+	.data       start:0x805DF928 end:0x805DF950
 
 Game/System/GameEventValueChecker.cpp:
 	.text       start:0x803B55E0 end:0x803B59D4
-	.rodata     start:0x8053D7C8 end:0x8053D8A8
-	.data       start:0x805DFB60 end:0x805DFB80
+	.rodata     start:0x8053D7C8 end:0x8053D890
+	.data       start:0x805DF950 end:0x805DFB80
 
 Game/System/GameSequenceDirector.cpp:
 	.text       start:0x803B59D4 end:0x803B5CE4
@@ -8943,7 +8943,7 @@ Game/System/SaveDataFileAccessor.cpp:
 Game/System/SaveDataHandler.cpp:
 	.text       start:0x803B7C68 end:0x803B8B38
 	.ctors      start:0x8052F398 end:0x8052F39C
-	.rodata     start:0x8053D8A8 end:0x8053D8C8
+	.rodata     start:0x8053D890 end:0x8053D8C8
 	.data       start:0x805DFDE8 end:0x805DFE88
 	.sdata      start:0x806B25F0 end:0x806B25F8
 	.sbss       start:0x806B6F88 end:0x806B6FA0
