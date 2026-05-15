@@ -1722,7 +1722,7 @@ config.libs = [
             Object(NonMatching, "Game/NPC/MiiFacePartsHolder.cpp"),
             Object(Matching, "Game/NPC/MiiFaceRecipe.cpp"),
             Object(Matching, "Game/NPC/Peach.cpp"),
-            Object(NonMatching, "Game/NPC/Penguin.cpp"),
+            Object(Matching, "Game/NPC/Penguin.cpp"),
             Object(NonMatching, "Game/NPC/PenguinCoach.cpp"),
             Object(Matching, "Game/NPC/PenguinMaster.cpp"),
             Object(NonMatching, "Game/NPC/PenguinRacer.cpp"),
@@ -3146,7 +3146,7 @@ config.libs = [
         "JSupport",
         [
             Object(NonMatching, "JSystem/JSupport/JSUList.cpp"),
-            Object(NonMatching, "JSystem/JSupport/JSUInputStream.cpp"),
+            Object(Matching, "JSystem/JSupport/JSUInputStream.cpp"),
             Object(NonMatching, "JSystem/JSupport/JSUOutputStream.cpp"),
             Object(Matching, "JSystem/JSupport/JSUMemoryStream.cpp"),
             Object(NonMatching, "JSystem/JSupport/JSUFileStream.cpp"),
