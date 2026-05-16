@@ -1723,7 +1723,7 @@ config.libs = [
             Object(Matching, "Game/NPC/MiiFaceRecipe.cpp"),
             Object(Matching, "Game/NPC/Peach.cpp"),
             Object(Matching, "Game/NPC/Penguin.cpp"),
-            Object(NonMatching, "Game/NPC/PenguinCoach.cpp"),
+            Object(Matching, "Game/NPC/PenguinCoach.cpp"),
             Object(Matching, "Game/NPC/PenguinMaster.cpp"),
             Object(Matching, "Game/NPC/PenguinRacer.cpp"),
             Object(Matching, "Game/NPC/PenguinRacerLeader.cpp"),
