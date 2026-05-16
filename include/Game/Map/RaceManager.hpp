@@ -18,6 +18,7 @@ public:
 
     void playCountAndGo();
     void playGo();
+    void playRecord();  // Note: this is very likely stripped
     void playGoal();
     void playLose();
     void playTimeUp();
