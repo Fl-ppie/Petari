@@ -3,7 +3,7 @@
 #include "Game/Map/RaceManager.hpp"
 #include "Game/NPC/NPCActor.hpp"
 
-class PenguinRacer : public NPCActor, AbstractRacer {
+class PenguinRacer : public NPCActor, public AbstractRacer {
 public:
     PenguinRacer(const char*);
 
