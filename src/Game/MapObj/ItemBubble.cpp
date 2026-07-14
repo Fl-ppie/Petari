@@ -15,7 +15,12 @@ namespace {
 namespace NrvItemBubble {
     NEW_NERVE(ItemBubbleNrvWait, ItemBubble, Wait);
     NEW_NERVE(ItemBubbleNrvBreak, ItemBubble, Break);
-}  // namespace NrvItemBubble
+};  // namespace NrvItemBubble
+
+void FORCE_OPERATOR() {
+    TVec3f vec;
+    vec *= 1.0f;
+}
 
 ItemBubble::ItemBubble(const char* pName) : LiveActor(pName), _90(nullptr), _94(nullptr) {
     _8C = 0.0f;
@@ -156,7 +161,7 @@ void ItemBubble::initAfterPlacement() {
     TPos3f mtx;
     MR::makeMtxRotate(mtx, mRotation);
     TVec3f vec;
-    mtx.getZDirInline(vec);
+    mtx.getZDir(vec);
 
     if (mUseRail)
         MR::moveCoordAndTransToNearestRailPos(this);
@@ -184,7 +189,7 @@ void ItemBubble::kill() {
                 break;
             case 1:
                 StarPiece* piece = getStarPiece(i);
-                piece->launch(getRotPartsPosition(i), grav.negateInline().multInLine(::cShootStarSpeed), false, false);
+                piece->launch(getRotPartsPosition(i), (-grav).multInLine(::cShootStarSpeed), false, false);
                 MR::startSound(this, "SE_OJ_STAR_PIECE_BURST");
                 break;
             }
@@ -210,8 +215,8 @@ void ItemBubble::calcAndSetBaseMtx() {
     }
 
     MR::normalize(&camcross);
-    reinterpret_cast< TPos3f* >(getBaseMtx())->setXYZDirInline(camcross, YDir, camPos);
-    reinterpret_cast< TPos3f* >(getBaseMtx())->setTransInline(mPosition);
+    reinterpret_cast< TPos3f* >(getBaseMtx())->setXYZDir(camcross, YDir, camPos);
+    reinterpret_cast< TPos3f* >(getBaseMtx())->setTrans(mPosition);
 }
 
 void ItemBubble::exeWait() {

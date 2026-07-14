@@ -86,7 +86,7 @@ void WaterBazooka::init(const JMapInfoIter& rIter) {
     MR::addMessageSensorEnemy(this, "cannon");
 
     MR::initCollisionParts(this, "Cannon1", getSensor("cannon"), MR::getJointMtx(this, "Cannon1"));
-    mCannonCollisionParts = MR::createCollisionPartsFromLiveActor(this, "AllRoot", getSensor("body"), static_cast< MR::CollisionScaleType >(2));
+    mCannonCollisionParts = MR::createCollisionPartsFromLiveActor(this, "AllRoot", getSensor("body"), MR::CollisionScaleType_Unk2);
     MR::validateCollisionParts(mCannonCollisionParts);
 
     initEffectKeeper(1, nullptr, false);
@@ -264,10 +264,7 @@ void WaterBazooka::exeWaitForBattle() {
 
     mBaseMtx.setInline(MR::getJointMtx(this, "Cannon1"));
 
-    bool start = false;
-    if (!MR::isValidSwitchA(this) || MR::isOnSwitchA(this) || MR::isStageStateScenarioOpeningCamera()) {
-        start = true;
-    }
+    bool start = !MR::isValidSwitchA(this) || MR::isOnSwitchA(this) || MR::isStageStateScenarioOpeningCamera();
 
     if (start) {
         setNerve(&NrvWaterBazooka::WaterBazookaNrvWait::sInstance);
@@ -564,8 +561,6 @@ void WaterBazooka::exeWaitForLaugh() {
 }
 
 void WaterBazooka::exePanic() {
-    // FIXME: r30, r31 regswap
-    // https://decomp.me/scratch/9cP5w
     if (MR::isFirstStep(this)) {
         MR::tryStartBck(this, "Wait", nullptr);
         mShotNum = 0;
@@ -573,10 +568,7 @@ void WaterBazooka::exePanic() {
 
     aimAtMario();
 
-    bool playerOn = false;
-    if (MR::isOnPlayer(getSensor("cannon")) || mCapsule->isPlayerOnCapsule()) {
-        playerOn = true;
-    }
+    bool playerOn = MR::isOnPlayer(getSensor("cannon")) || mCapsule->isPlayerOnCapsule();
 
     if (!playerOn && MR::isOnGroundPlayer()) {
         setNerve(&NrvWaterBazooka::WaterBazookaNrvWait::sInstance);
@@ -611,9 +603,7 @@ void WaterBazooka::exeStorm() {
 
     f32 deg = MR::calcNerveEaseOutValue(this, 150, 25.0f, 0.0f);
     MR::rotateVecDegree(&side, mGravity, deg);
-    TVec3f up;
-    JGeometry::negateInternal(&mGravity.x, &up.x);
-    MR::makeMtxSideUpPos(&mBaseMtx, side, up, pos);
+    MR::makeMtxSideUpPos(&mBaseMtx, side, -mGravity, pos);
 
     MR::startLevelSound(this, "SE_EM_LV_WATERBAZ_STORM", (deg * 100.0f) / 25.0f);
 
@@ -716,7 +706,7 @@ bool WaterBazooka::aimAtMario() {
     mBaseMtx.getTrans(cannonPos);
 
     TVec3f aimPos;
-    aimPos.scaleAdd(mGravity.negateOperatorInternal(), *MR::getPlayerPos(), 100.0f);
+    aimPos.scaleAdd(-mGravity, *MR::getPlayerPos(), 100.0f);
 
     TVec3f aim;
     aim.sub(aimPos, cannonPos);
@@ -724,19 +714,18 @@ bool WaterBazooka::aimAtMario() {
     MR::turnVecToVecCos(&side, side, aim, MR::cosDegree(1.2f), mGravity, 0.02f);
 
     TVec3f v1;
-    MR::turnVecToPlane(&v1, side, mGravity.negateOperatorInternal());
+    MR::turnVecToPlane(&v1, side, -mGravity);
     MR::clampVecAngleDeg(&side, v1, 15.0f);
 
-    if (side.dot(mGravity.negateOperatorInternal()) > 0.0f) {
-        MR::turnVecToPlane(&side, side, mGravity.negateOperatorInternal());
+    if (side.dot(-mGravity) > 0.0f) {
+        MR::turnVecToPlane(&side, side, -mGravity);
     }
 
-    MR::makeMtxSideUpPos(&mBaseMtx, side, mGravity.negateOperatorInternal(), cannonPos);
+    MR::makeMtxSideUpPos(&mBaseMtx, side, -mGravity, cannonPos);
 
     TVec3f side2;
     mBaseMtx.getXDir(side2);
-    f32 angle = JMath::sAtanTable.atan2_(side2.cross(aim).length(), side2.dot(aim));
-    return __fabsf(angle) * _180_PI <= 2.0f;
+    return side2.angle(aim) * _180_PI <= 2.0f;
 }
 
 void WaterBazooka::switchShowOrHide() {
@@ -848,19 +837,13 @@ bool WaterBazooka::tryPanic() {
         return false;
     }
 
-    bool b1 = false;
-    if (isNerve(&NrvWaterBazooka::WaterBazookaNrvPanic::sInstance) || isNerve(&NrvWaterBazooka::WaterBazookaNrvStorm::sInstance)) {
-        b1 = true;
-    }
+    bool b1 = isNerve(&NrvWaterBazooka::WaterBazookaNrvPanic::sInstance) || isNerve(&NrvWaterBazooka::WaterBazookaNrvStorm::sInstance);
 
     if (b1) {
         return false;
     }
 
-    bool playerOn = false;
-    if (MR::isOnPlayer(getSensor("cannon")) || mCapsule->isPlayerOnCapsule()) {
-        playerOn = true;
-    }
+    bool playerOn = MR::isOnPlayer(getSensor("cannon")) || mCapsule->isPlayerOnCapsule();
 
     if (!playerOn) {
         return false;
@@ -969,10 +952,7 @@ ElectricPressureBullet* WaterBazooka::selectBulletElectric() {
 }
 
 bool WaterBazooka::tryJumpBackPlayerFromBazooka() const {
-    bool playerOn = false;
-    if (MR::isOnPlayer(getSensor("cannon")) || mCapsule->isPlayerOnCapsule()) {
-        playerOn = true;
-    }
+    bool playerOn = MR::isOnPlayer(getSensor("cannon")) || mCapsule->isPlayerOnCapsule();
 
     if (!playerOn && !mCapsule->isPlayerOnCapsule()) {
         return false;
@@ -982,10 +962,9 @@ bool WaterBazooka::tryJumpBackPlayerFromBazooka() const {
     calcNearDropPoint(&dropPoint);
     TVec3f jumpDir;
     jumpDir.sub(dropPoint, *MR::getPlayerPos());
-    const TVec3f& grav = mGravity;
     TVec3f rej;
-    rej.rejection(jumpDir, grav);
-    TVec3f rej2(rej.negateOperatorInternal());
+    rej.rejection(jumpDir, mGravity);
+    TVec3f rej2 = -rej;
 
     MR::offBind(MR::getPlayerDemoActor());
     MR::unlockPlayerAnimation();
@@ -1016,7 +995,7 @@ void WaterBazooka::calcNearDropPoint(TVec3f* pPos) const {
 
     if (MR::isNearZero(toPlayer)) {
         MR::getPlayerFrontVec(&toPlayer);
-        toPlayer.negateInternal();
+        toPlayer.negate();
     }
 
     pPos->scaleAdd(toPlayer, mPosition, 800.0f);
@@ -1031,7 +1010,7 @@ void WaterBazooka::calcGunPointFromCannon(TPos3f* pMtx) {
     JMAVECScaleAdd(&side, &pos, &pos, 550.0f);
     pMtx->setInline(mtx);
     TVec3f up;
-    mtx.getYDirInline(up);
+    mtx.getYDir(up);
     TVec3f front;
     mtx.getZDir(front);
     MR::makeMtxFrontUpPos(pMtx, side, up, pos);
@@ -1040,7 +1019,7 @@ void WaterBazooka::calcGunPointFromCannon(TPos3f* pMtx) {
 void WaterBazooka::setCameraTargetMtx() {
     TPos3f mtx(mShooter->getBaseMtx());
 
-    mtx.setPos(mPosition);
+    mtx.setTrans(mPosition);
     TVec3f up;
     MR::calcUpVec(&up, this);
     TVec3f front;

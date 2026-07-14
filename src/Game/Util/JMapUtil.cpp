@@ -121,6 +121,7 @@ namespace MR {
             TMtx34f* placementMtx = getZonePlacementMtx(rIter);
             rotateMtx.concat(*placementMtx, rotateMtx);
 
+            // TODO: getEuler but for std?
             if (-0.001f <= rotateMtx.mMtx[2][0] - 1.0f) {
                 pOut->x = std::atan2(-rotateMtx.mMtx[0][1], rotateMtx.mMtx[1][1]);
                 pOut->y = -1.5707964f;
@@ -132,10 +133,10 @@ namespace MR {
             } else {
                 pOut->x = std::atan2(rotateMtx.mMtx[2][1], rotateMtx.mMtx[2][2]);
                 pOut->z = std::atan2(rotateMtx.mMtx[1][0], rotateMtx.mMtx[0][0]);
-                pOut->y = asin(-rotateMtx.mMtx[2][0]);
+                pOut->y = ::asin(-rotateMtx.mMtx[2][0]);
             }
 
-            *pOut = pOut->multInLine(_180_PI);
+            *pOut = *pOut * _180_PI;
         }
 
         return true;

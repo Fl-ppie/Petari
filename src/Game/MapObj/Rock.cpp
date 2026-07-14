@@ -255,7 +255,7 @@ void Rock::control() {
 
     MR::vecKillElement(MR::getRailPos(this) - mPosition, mGravity, &mVelocity);
     TVec3f grav(mGravity);
-    grav.scale(mGravityRate);
+    grav *= mGravityRate;
     mFallVelocity.add(grav);
     mVelocity.add(mFallVelocity);
 
@@ -276,11 +276,11 @@ void Rock::calcAndSetBaseMtx() {
         if (isNerve(&NrvRock::RockNrvMove::sInstance)) {
             up.set(*MR::getGroundNormal(this));
         } else {
-            up.negateOtherInternal(grav);
+            up.negate(grav);
         }
 
         TVec3f pos;
-        pos.sub(mPosition, up.scaleInline(mRadius));
+        pos.sub(mPosition, up * mRadius);
 
         if (MR::isSameDirection(up, mFront, 0.01f)) {
             MR::makeMtxUpNoSupportPos(&mBaseMtx, up, pos);
@@ -381,14 +381,11 @@ bool Rock::receiveMsgEnemyAttack(u32 msg, HitSensor* pSender, HitSensor* pReceiv
 }
 
 void Rock::initMapToolInfo(const JMapInfoIter& rIter) {
-    // FIXME: float regswap
-    // https://decomp.me/scratch/QfKvF
-
     MR::initDefaultPos(this, rIter);
     mAppearPos.set(mPosition);
 
     mRadius = getRadius() * ::cBinderRadius;
-    mRotateSpeed = (mMoveSpeed * 180.0f * ::cRotateSpeedRate) / (PI * mRadius);  // regswap
+    mRotateSpeed = (mMoveSpeed * 180.0f * ::cRotateSpeedRate) / (MR::pi() * mRadius);  // regswap
 
     MR::getJMapInfoArg3NoInit(rIter, &mAppearTime);
     if (mRockType == NormalRock) {
@@ -400,8 +397,8 @@ void Rock::initMapToolInfo(const JMapInfoIter& rIter) {
     } else {
         TPos3f mtx;
         MR::makeMtxTR(mtx, this);
-        mtx.getYDirInline(mGravity);
-        mGravity.negateInternal();
+        mtx.getYDir(mGravity);
+        mGravity.negate();
     }
 }
 
@@ -454,8 +451,7 @@ void Rock::initSensor() {
     MR::addHitSensor(this, "body", sensorType, 16, ::cSensorRadius * getRadius(), TVec3f(0.0f, 0.0f, 0.0f));
 
     if (mRockType == NormalRock) {
-        MR::addHitSensor(this, "weak", sensorType, 16, ::cWeakSensorRadius * getRadius(),
-                         static_cast< TVec3f >(::cWeakSensorOffset).scaleInline(getRadius()));
+        MR::addHitSensor(this, "weak", sensorType, 16, ::cWeakSensorRadius * getRadius(), static_cast< TVec3f >(::cWeakSensorOffset) * getRadius());
     }
 }
 
@@ -509,8 +505,7 @@ bool Rock::move(f32 speed) {
 }
 
 void Rock::calcBaseMtx(TPos3f* pMtx) const {
-    TVec3f up;
-    up.negateOtherInternal(mGravity);
+    TVec3f up = -mGravity;
 
     if (MR::isSameDirection(up, mFront, 0.01f)) {
         MR::makeMtxUpNoSupportPos(pMtx, up, mPosition);
@@ -637,8 +632,8 @@ void Rock::updateRotateX(f32 angle) {
 }
 
 void Rock::appearStarPiece() {
-    TVec3f pieceDir(mGravity);
-    pieceDir.negateInternal();
+    TVec3f pieceDir = mGravity;
+    pieceDir.negate();
     if (MR::appearStarPieceToDirection(mCreator, mPosition, pieceDir, getAppearStarPieceNum(mRockType), 10.0f, 40.0f, false)) {
         MR::startSound(this, "SE_OJ_STAR_PIECE_BURST");
     }
@@ -649,8 +644,8 @@ void Rock::moveOnRail(f32 speed, f32 rotateSpeed, bool isValidBind) {
     updateRotateX(mRotation.x + rotateSpeed);
     if (isValidBind) {
         TVec3f pos;
-        if (MR::getFirstPolyOnLineToMap(&pos, nullptr, mPosition, mGravity.scaleInline(mRadius * 2.0f))) {
-            mPosition.add(pos, mGravity.scaleInline(-mRadius));
+        if (MR::getFirstPolyOnLineToMap(&pos, nullptr, mPosition, mGravity * (mRadius * 2.0f))) {
+            mPosition.add(pos, mGravity * (-mRadius));
         }
     }
 }
@@ -879,24 +874,11 @@ void Rock::exeBreak() {
         rotMtx.makeRotate(mGravity, MR::getRandom(0.0f, TWO_PI));
         mtx.concat(rotMtx, mtx);
 
-        // TODO: this logic is reused in many places, is this an inline from ActorMovementUtil?
         TVec3f rot;
-        if ((mtx[2][0] - 1.0f) >= -0.0000038146973f) {
-            rot.x = JMath::sAtanTable.atan2_(-mtx[0][1], mtx[1][1]);
-            rot.y = -HALF_PI;
-            rot.z = 0.0f;
-        } else if ((mtx[2][0] + 1.0f) <= 0.0000038146973f) {
-            rot.x = JMath::sAtanTable.atan2_(mtx[0][1], mtx[1][1]);
-            rot.y = HALF_PI;
-            rot.z = 0.0f;
-        } else {
-            rot.x = JMath::sAtanTable.atan2_(mtx[2][1], mtx[2][2]);
-            rot.y = JMath::sAtanTable.atan2_(mtx[1][0], mtx[0][0]);
-            rot.z = JGeometry::TUtil< f32 >::asin(-mtx[2][0]);
-        }
-        mBreakModel->mRotation.x = _180_PI * rot.x;
-        mBreakModel->mRotation.y = _180_PI * rot.y;
-        mBreakModel->mRotation.z = _180_PI * rot.z;
+        mtx.getEulerXYZ(rot);
+        mBreakModel->mRotation.x = MR::toDegree(rot.x);
+        mBreakModel->mRotation.y = MR::toDegree(rot.y);
+        mBreakModel->mRotation.z = MR::toDegree(rot.z);
 
         mBreakModel->appear();
 
@@ -949,7 +931,7 @@ void Rock::exeFreeze() {
     f32 f2 = step * (f1 * ::cFreezeRumbleWidth) / ::cFreezeFrame;
     TVec3f v1;
     v1.set(MR::getCamXdir());
-    v1.scale(f2);
+    v1 *= f2;
     mPosition.add(mFreezePos, v1);
 
     if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {

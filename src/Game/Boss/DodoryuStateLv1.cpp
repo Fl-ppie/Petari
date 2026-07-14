@@ -346,8 +346,8 @@ bool DodoryuStateLv1::catchPlayerAttack(u32 msg, HitSensor* pSender, HitSensor* 
         _98.set(pReceiver->mPosition - pSender->mPosition);
 
         if (!calcVerticalizedDir(&_98, _98)) {
-            mHost->mBaseMtx.getZDirInline(_98);
-            _98.negateInternal();
+            mHost->mBaseMtx.getZDir(_98);
+            _98.negate();
         }
 
         MR::tryRumblePadMiddle(this, 0);
@@ -392,7 +392,7 @@ void DodoryuStateLv1::updatePop() {
     TPos3f mtx = mHost->mBaseMtx;
     TVec3f trans;
     mtx.getTrans(trans);
-    trans.add(mHost->mGravity.negateOperatorInternal() * mPopAccel);
+    trans.add(-mHost->mGravity * mPopAccel);
 
     mPopSpeed += mPopAccel;
     mPopAccel -= 2.5f;

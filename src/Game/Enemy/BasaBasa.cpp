@@ -251,12 +251,10 @@ void BasaBasa::exeAttackStart() {
     MR::turnDirectionToTargetDegree(this, &_9C, *_B4, 2.55f);
     TVec3f v3;
     JMAVECScaleAdd(&_9C, &mGravity, &v3, 2.0f);
-    JGeometry::negateInternal(&v3.x, &v3.x);
+    v3.negate();
     MR::normalizeOrZero(&v3);
     if (MR::isNearZero(v3)) {
-        TVec3f gravityNeg;
-        JGeometry::negateInternal(&mGravity.x, &gravityNeg.x);
-        v3.set< f32 >(gravityNeg);
+        v3.set(-mGravity);
     }
 
     JMAVECScaleAdd(&v3, &mVelocity, &mVelocity, 0.2f);
@@ -322,7 +320,7 @@ void BasaBasa::exeAttackEndRecover() {
 
     TVec3f v3;
     JMAVECScaleAdd(&_9C, &mGravity, &v3, -0.5f);
-    JGeometry::negateInternal(&v3.x, &v3.x);
+    v3.negate();
     MR::normalize(&v3);
     if (MR::getBckFrame(this) >= 116.0f) {
         JMAVECScaleAdd(&v3, &mVelocity, &mVelocity, 0.3f);
@@ -346,12 +344,10 @@ void BasaBasa::exeHitBack() {
     if (MR::isLessEqualStep(this, 5)) {
         TVec3f v3;
         v3.add(_9C, mGravity);
-        JGeometry::negateInternal(&v3.x, &v3.x);
+        v3.negate();
         MR::normalizeOrZero(&v3);
         if (MR::isNearZero(v3)) {
-            TVec3f v2;
-            JGeometry::negateInternal(&mGravity.x, &v2.x);
-            v3.set< f32 >(v2);
+            v3.set(-mGravity);
         }
         JMAVECScaleAdd(&v3, &mVelocity, &mVelocity, 15.0f);
     }
@@ -728,53 +724,52 @@ void BasaBasa::updateRailType() {
 }
 
 void BasaBasa::controlVelocity() {
-    bool v1 = false;
-    if (isNerve(&NrvBasaBasa::BasaBasaNrvTrampleDown::sInstance) || isNerve(&NrvBasaBasa::BasaBasaNrvPunchDown::sInstance)) {
-        v1 = true;
+    bool v1 = isNerve(&NrvBasaBasa::BasaBasaNrvTrampleDown::sInstance) || isNerve(&NrvBasaBasa::BasaBasaNrvPunchDown::sInstance);
+
+    if (v1) {
+        return;
     }
 
-    if (!v1) {
-        TVec3f v15;
-        MR::calcSideVec(&v15, this);
-        f32 v3 = v15.dot(mVelocity);
-        TVec3f v14;
-        v14.scale(v3, v15);
-        v14.scale(0.5f);
-        TVec3f* velocity = &mVelocity;
-        f32 v4 = v15.dot(*velocity);
-        JMAVECScaleAdd(&v15, velocity, velocity, -v4);
-        mVelocity.add(v14);
-        f32 v5 = 0.95f;
-        if (isNerve(&NrvBasaBasa::BasaBasaNrvAttackEnd::sInstance)) {
-            v5 = 0.96f;
-        } else if (isNerve(&NrvBasaBasa::BasaBasaNrvChaseStart::sInstance)) {
-            v5 = 0.45f;
-        }
+    TVec3f v15;
+    MR::calcSideVec(&v15, this);
+    f32 v3 = v15.dot(mVelocity);
+    TVec3f v14;
+    v14.scale(v3, v15);
+    v14.scale(0.5f);
+    TVec3f* velocity = &mVelocity;
+    f32 v4 = v15.dot(*velocity);
+    JMAVECScaleAdd(&v15, velocity, velocity, -v4);
+    mVelocity.add(v14);
+    f32 v5 = 0.95f;
+    if (isNerve(&NrvBasaBasa::BasaBasaNrvAttackEnd::sInstance)) {
+        v5 = 0.96f;
+    } else if (isNerve(&NrvBasaBasa::BasaBasaNrvChaseStart::sInstance)) {
+        v5 = 0.45f;
+    }
 
-        mVelocity.scale(v5);
-        f32 v6;
-        if (isNerve(&NrvBasaBasa::BasaBasaNrvChaseStart::sInstance)) {
-            v6 = 15.0f;
-        } else if (isNerve(&NrvBasaBasa::BasaBasaNrvHitBack::sInstance)) {
-            v6 = 15.0f;
-        } else if (isNerve(&NrvBasaBasa::BasaBasaNrvQuickTurn::sInstance)) {
-            v6 = 8.0f;
-        } else if (isNerve(&NrvBasaBasa::BasaBasaNrvAttack::sInstance)) {
-            v6 = 23.0f;
-        } else {
-            v6 = 8.0f;
-        }
+    mVelocity.scale(v5);
+    f32 v6;
+    if (isNerve(&NrvBasaBasa::BasaBasaNrvChaseStart::sInstance)) {
+        v6 = 15.0f;
+    } else if (isNerve(&NrvBasaBasa::BasaBasaNrvHitBack::sInstance)) {
+        v6 = 15.0f;
+    } else if (isNerve(&NrvBasaBasa::BasaBasaNrvQuickTurn::sInstance)) {
+        v6 = 8.0f;
+    } else if (isNerve(&NrvBasaBasa::BasaBasaNrvAttack::sInstance)) {
+        v6 = 23.0f;
+    } else {
+        v6 = 8.0f;
+    }
 
-        if (PSVECMag(&mVelocity) > v6) {
-            TVec3f* velocityPtr = &mVelocity;
-            f32 sqr = velocityPtr->squared();
-            if (sqr <= 0.0000038146973f) {
-                velocityPtr->scale(v6 * JGeometry::TUtil< f32 >::inv_sqrt(sqr));
-            }
-        } else {
-            if (MR::isNearZero(mVelocity)) {
-                mVelocity.zero();
-            }
+    if (mVelocity.length() > v6) {
+        TVec3f* velocityPtr = &mVelocity;
+        f32 sqr = velocityPtr->squared();
+        if (sqr <= 0.0000038146973f) {
+            velocityPtr->scale(v6 * JGeometry::TUtil< f32 >::inv_sqrt(sqr));
+        }
+    } else {
+        if (MR::isNearZero(mVelocity)) {
+            mVelocity.zero();
         }
     }
 }
@@ -790,7 +785,7 @@ void BasaBasa::tuneHeight() {
             v5.scale(MR::getShadowProjectionLength(this, nullptr) - (_AC - 350.0f), mGravity);
         }
 
-        if (PSVECMag(&v5) < 2.0f) {
+        if (v5.length() < 2.0f) {
             return;
         } else {
             TVec3f v4;

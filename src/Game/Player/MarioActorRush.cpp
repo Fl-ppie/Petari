@@ -3,6 +3,7 @@
 #include "Game/Player/MarioActor.hpp"
 #include "Game/Player/MarioAnimator.hpp"
 #include "Game/Player/MarioModule.hpp"
+#include "Game/Player/MarioParts.hpp"
 #include "Game/Player/MarioSwim.hpp"
 #include "Game/Player/MarioWait.hpp"
 #include "Game/Util.hpp"
@@ -77,12 +78,12 @@ void MarioActor::resetCondition() {
     mMario->mSwim->_78 = 0;
     mMario->_1C._3 = 0;
 
-    if (mMario->isStatusActive(6) && v2) {
+    if (mMario->isStatusActive(MarioStatus_Swim) && v2) {
         if (!_468) {
             mMario->mSwim->resetJet();
         }
-    } else if (mMario->isStatusActive(33) && mPlayerMode == 6) {
-        if (mMario->isStatusActive(28)) {
+    } else if (mMario->isStatusActive(MarioStatus_Teresa) && mPlayerMode == 6) {
+        if (mMario->isStatusActive(MarioStatus_Wait)) {
             mMario->closeStatus(mMario->mWait);
         }
 
@@ -101,7 +102,7 @@ void MarioActor::resetCondition() {
 
     resetPadSwing();
 
-    if (mMario->isStatusActive(6) && v2) {
+    if (mMario->isStatusActive(MarioStatus_Swim) && v2) {
         if (_468) {
             mMario->changeAnimation("水泳ジェット", "水泳ジェット");
         } else {

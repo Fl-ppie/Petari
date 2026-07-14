@@ -138,7 +138,7 @@ void Takobo::initSensor() {
     offs.x = 0.0f;
     offs.y = 70.0f * yScale;
     offs.z = 0.0f;
-    MR::addHitSensor(this, "body", 26, 32, offs.y, offs);
+    MR::addHitSensor(this, "body", ATYPE_TAKOBO, 32, offs.y, offs);
     MR::addHitSensorAtJointEnemyAttack(this, "attack", "Hear", 0x10, (80.0f * yScale), TVec3f(10.0f, 2.0f, 0.0f));
 }
 
@@ -185,11 +185,7 @@ void Takobo::control() {
 }
 
 void Takobo::generateCoin() {
-    TVec3f v3(mGravity);
-    v3 *= 80.0f;
-    TVec3f v4(mPosition);
-    v4 -= v3;
-    MR::appearCoinPop(this, v4, 1);
+    MR::appearCoinPop(this, mPosition - mGravity * 80.0f, 1);
 }
 
 bool Takobo::tryPress() {
@@ -205,12 +201,7 @@ bool Takobo::tryPress() {
 void Takobo::exeMove() {
     if (MR::isFirstStep(this)) {
         TVec3f v21(mPosition);
-        f32 val = _C4;
-        TVec3f v18(_B0);
-        v18 *= val;
-        TVec3f v19(_A4);
-        v19 -= v18;
-        v21 -= v19;
+        v21 -= _A4 - _B0 * _C4;
 
         if (_BC) {
             _C8 = -_C4;
@@ -239,21 +230,14 @@ void Takobo::exeMove() {
     }
 
     f32 ease = MR::getEaseInOutValue(rate, _C8, _CC, 1.0f);
-    TVec3f v15(_B0);
-    v15 *= ease;
-    TVec3f v16(_A4);
-    v16 += v15;
-    TVec3f v17(v16);
-    v17 -= mPosition;
-    mVelocity.set< f32 >(v17);
+    mVelocity.set< f32 >(_A4 + _B0 * ease - mPosition);
 
     if (MR::isGreaterStep(this, _D0)) {
         _BC = _BC == false;
         setNerve(&NrvTakobo::HostTypeNrvMove::sInstance);
     } else {
-        TVec3f v20(*MR::getPlayerPos());
-        v20 -= mPosition;
-        f32 mag = PSVECMag(&v20);
+        TVec3f v20(*MR::getPlayerPos() - mPosition);
+        f32 mag = v20.length();
         MR::vecKillElement(v20, mGravity, &v20);
         MR::normalizeOrZero(&v20);
 
@@ -500,7 +484,7 @@ bool Takobo::receiveMsgPlayerAttack(u32 msg, HitSensor* a2, HitSensor* a3) {
 }
 
 bool Takobo::receiveMsgEnemyAttack(u32 msg, HitSensor* a2, HitSensor* a3) {
-    if (!a3->isType(26)) {
+    if (!a3->isType(ATYPE_TAKOBO)) {
         return false;
     }
 

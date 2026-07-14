@@ -89,15 +89,15 @@ bool IronCannonLauncherPoint::tryShotBullet(f32 offset) {
     TPos3f mtx;
     MR::makeMtxTRS(mtx, mPosition, mRotation, mScale);
     TVec3f vec;
-    mtx.getZDirInline(vec);
+    mtx.getZDir(vec);
 
     TVec3f vec2;
     vec2.scaleAdd(vec, mPosition, ::sGunPointOffset + offset);
-    pShell->launch(vec2, vec.multInLine(mBulletSpeed));
+    pShell->launch(vec2, vec * mBulletSpeed);
 
     TVec3f shadowdir;
-    mtx.getYDirInline(shadowdir);
-    shadowdir.invertInternal();
+    mtx.getYDir(shadowdir);
+    shadowdir.negate();
     MR::setShadowDropDirection(pShell, nullptr, shadowdir);
 
     MR::emitEffect(this, "Shoot");

@@ -3,6 +3,12 @@
 #include "Inline.hpp"
 #include "JSystem/JMath.hpp"
 
+void DUMMY() {
+    // emit operator-()
+    TVec3f a;
+    TVec3f b = -a;
+}
+
 void ParallelGravity_FORCE_MATCH_SDATA2() {
     (void)1.0f;
     (void)0.0f;
@@ -32,7 +38,7 @@ bool ParallelGravity::calcOwnGravityVector(TVec3f* pDest, f32* pScalar, const TV
 }
 
 void ParallelGravity::updateMtx(const TPos3f& rMtx) {
-    rMtx.mult33Inline(mPlaneUpVec, mWorldPlaneUpVec);
+    rMtx.mult33(mPlaneUpVec, mWorldPlaneUpVec);
     rMtx.mult(mPlanePosition, mWorldPlanePosition);
     MR::normalizeOrZero(&mWorldPlaneUpVec);
 
@@ -51,10 +57,7 @@ void ParallelGravity::updateMtx(const TPos3f& rMtx) {
 
 void ParallelGravity::setPlane(const TVec3f& rPlaneUp, const TVec3f& rPlanePos) {
     // Up vector
-    mPlaneUpVec.set(rPlaneUp);
-    PSVECMag(&mPlaneUpVec);  // unused result
-    PSVECNormalize(&mPlaneUpVec, &mPlaneUpVec);
-
+    mPlaneUpVec.normalize(rPlaneUp);
     // Position
     mPlanePosition = rPlanePos;
 }
@@ -102,7 +105,7 @@ bool ParallelGravity::isInSphereRange(const TVec3f& rPosition, f32* pScalar) con
 bool ParallelGravity::isInBoxRange(const TVec3f& rPosition, f32* pScalar) const {
     // Get direction to center
     TVec3f translation;
-    mWorldMtx.getTransInline(translation);
+    mWorldMtx.getTrans(translation);
     TVec3f dirToCenter(rPosition - translation);
 
     // Check in X direction

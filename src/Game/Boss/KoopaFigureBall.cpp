@@ -67,13 +67,13 @@ void KoopaFigureBall::control() {
 
     TVec3f vec1;
     TVec3f vec2;
-    mBaseMtx.getYDirInline(vec1);
-    mBaseMtx.getTransInline(vec2);
+    mBaseMtx.getYDir(vec1);
+    mBaseMtx.getTrans(vec2);
     vec2 += vec1 * mRadius;
     mBaseMtx.setTrans(vec2);
 
     TPos3f mtx;
-    mtx.setRotateInlineZeroTrans(TVec3f(1.0f, 0.0f, 0.0f), MR::toRadian(mAngle));
+    mtx.makeRotate(TVec3f(1.0f, 0.0f, 0.0f), MR::toRadian(mAngle));
     mBaseMtx.concat(mBaseMtx, mtx);
 }
 

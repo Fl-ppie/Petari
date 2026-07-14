@@ -78,12 +78,16 @@ void KoopaFireShort::appear() {
 
     TPos3f transform;
     transform.setInline(MR::getJointMtx(mKoopa, "Tongue2"));
-    transform.getTransInline(mPosition);
+    transform.getTrans(mPosition);
     transform.getYDir(mVelocity);
 
     MR::vecKillElement(mVelocity, mGravity, &mVelocity);
 
-    MR::isNearZero(mVelocity) ? transform.getYDir(mVelocity) : MR::normalize(&mVelocity);
+    if (MR::isNearZero(mVelocity)) {
+        transform.getYDir(mVelocity);
+    } else {
+        MR::normalize(&mVelocity);
+    }
 
     f32 radius = 80.0f * mScale.x;
     mVelocity.x *= ::sFlySpeedNormal;
@@ -165,9 +169,7 @@ void KoopaFireShort::exeFly() {
         updateFly();
 
         if (MR::isLessStep(this, 50)) {
-            TVec3f gravity = mGravity;
-            gravity.scale(4.0f);
-            mPosition.add(gravity);
+            mPosition += mGravity * 4.0f;
         }
 
         if (MR::isGreaterStep(this, mDuration)) {

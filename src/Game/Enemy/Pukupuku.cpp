@@ -215,11 +215,9 @@ void PukupukuStateLanding::emitGroundHitEffect() {
     if (!MR::isBindedGround(mHost)) {
         Triangle triangle;
         Pukupuku* parent = mHost;
-        TVec3f v3(parent->mGravity);
-        v3.scale(100.0f);
 
         TVec3f poly;
-        if (MR::getFirstPolyOnLineToMap(&poly, &triangle, parent->mPosition, v3)) {
+        if (MR::getFirstPolyOnLineToMap(&poly, &triangle, parent->mPosition, mHost->mGravity * 100.0f)) {
             MR::updateEffectFloorCode(mHost, &triangle);
         }
     }
@@ -252,7 +250,7 @@ void Pukupuku::init(const JMapInfoIter& rIter) {
     MR::connectToSceneEnemy(this);
     MR::initLightCtrl(this);
     initHitSensor(1);
-    MR::addHitSensorAtJoint(this, "body", "center", 34, 8, 60.0f, TVec3f(0.0f, 0.0f, 0.0f));
+    MR::addHitSensorAtJoint(this, "body", "center", ATYPE_NOKONOKO, 8, 60.0f, TVec3f(0.0f, 0.0f, 0.0f));
     initBinder(70.0f, 0.0f, 0);
     MR::setBinderOffsetVec(this, &_9C, false);
     initRailRider(rIter);
@@ -360,11 +358,7 @@ void Pukupuku::exeWait() {
 }
 
 void Pukupuku::exeMoveWater() {
-    bool v2 = false;
-
-    if (isNerve(&PukupukuTrampled::sInstance) || isNerve(&PukupukuBlownOff::sInstance)) {
-        v2 = true;
-    }
+    bool v2 = isNerve(&PukupukuTrampled::sInstance) || isNerve(&PukupukuBlownOff::sInstance);
 
     if (!v2 && !tryBindStarPointer()) {
         if (MR::isFirstStep(this)) {
@@ -406,9 +400,7 @@ void Pukupuku::exeTrampled() {
         TPos3f hitMtx;
         calcGroundHitMtx(&hitMtx);
         hitMtx.getQuat(_A8);
-        TVec3f v4(mGravity);
-        v4.scale(10.0f);
-        mVelocity.set< f32 >(v4);
+        mVelocity.set< f32 >(mGravity * 10.0f);
         startAnim("Flat", "CloseEye");
         MR::startSound(this, "SE_EM_STOMPED_S");
     } else if (!MR::isBinded(this)) {

@@ -156,7 +156,7 @@ namespace DodoryuSub {
             DodoryuUtil::turnToward(mHost, accelDir, 1.8f);
         } else {
             TVec3f yDir;
-            mHost->mBaseMtx.getYDirInline(yDir);
+            mHost->mBaseMtx.getYDir(yDir);
 
             accelDir.cross(yDir, mHost->_134);
         }
@@ -231,7 +231,7 @@ namespace DodoryuSub {
         DodoryuUtil::calcVerticalizedDir(mHost, &toPlayer, toPlayer);
         DodoryuUtil::turnToward(mHost, toPlayer, _10);
 
-        mHost->mVelocity.set(toPlayer.scaleInline(_14));
+        mHost->mVelocity.set(toPlayer * _14);
 
         if (mHost->checkWallWithVelocity()) {
             DodoryuUtil::rotateVelocityByWall(mHost);

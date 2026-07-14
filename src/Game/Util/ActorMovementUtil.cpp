@@ -26,15 +26,8 @@ namespace {
     // TODO: figure out where exactly to put this
     inline void DO_ROTATE(const TPos3f& rMtx, TVec3f* pVec, f32 f1) {
         if (3.0f < f1) {
-            if (rMtx[2][0] - 1.0f >= -(f32)JGeometry::TUtil< f32 >::epsilon()) {
-                pVec->set(JMAATan2(-rMtx[0][1], rMtx[1][1]), -HALF_PI, 0.0f);
-            } else if (rMtx[2][0] + 1.0f <= (f32)JGeometry::TUtil< f32 >::epsilon()) {
-                pVec->set(JMAATan2(rMtx[0][1], rMtx[1][1]), HALF_PI, 0.0f);
-            } else {
-                pVec->x = JMAATan2(rMtx[2][1], rMtx[2][2]);
-                pVec->z = JMAATan2(rMtx[1][0], rMtx[0][0]);
-                pVec->y = JGeometry::TUtil< f32 >::asin(-rMtx[2][0]);
-            }
+            rMtx.getEulerXYZ(*pVec);
+
         } else {
             pVec->x = std::atan2(rMtx[2][1], rMtx[2][2]);
             pVec->z = std::atan2(rMtx[1][0], rMtx[0][0]);
@@ -92,24 +85,28 @@ namespace MR {
     f32 calcDistanceHorizontal(const LiveActor* pActor, const TVec3f& a2, const TVec3f& a3) {
         TVec3f stack_8 = a2 - pActor->mPosition;
         MR::vecKillElement(stack_8, a3, &stack_8);
-        return PSVECMag((Vec*)&stack_8);
+        return stack_8.length();
     }
 
     f32 calcDistanceVertical(const LiveActor* pActor, const TVec3f& a2, const TVec3f& a3) {
         TVec3f stack_8 = a2 - pActor->mPosition;
         stack_8.scale(a3.dot(stack_8), a3);
-        return PSVECMag((Vec*)&stack_8);
+        return stack_8.length();
     }
 
     f32 calcDistanceVertical(const LiveActor* pActor, const TVec3f& a2) {
         const TVec3f& grav = pActor->mGravity;
         TVec3f stack_8 = a2 - pActor->mPosition;
         stack_8.scale(grav.dot(stack_8), grav);
-        return PSVECMag((Vec*)&stack_8);
+        return stack_8.length();
     }
 
     f32 calcDistanceToPlayer(const LiveActor* pActor) {
-        return (!MR::isExistSceneObj(SceneObj_MarioHolder) ? FLOAT_MAX : PSVECDistance((Vec*)&pActor->mPosition, (Vec*)MR::getPlayerPos()));
+        if (!MR::isExistSceneObj(SceneObj_MarioHolder)) {
+            return FLOAT_MAX;
+        }
+
+        return pActor->mPosition.distance(*MR::getPlayerPos());
     }
 
     f32 calcDistanceToPlayerH(const LiveActor* pActor) {
@@ -118,7 +115,7 @@ namespace MR {
         }
         TVec3f stack_8 = *MR::getPlayerPos() - pActor->mPosition;
         MR::vecKillElement(stack_8, pActor->mGravity, &stack_8);
-        return PSVECMag((Vec*)&stack_8);
+        return stack_8.length();
     }
 
     bool isNear(const HitSensor* pSensor_1, const HitSensor* pSensor_2, f32 dist) {
@@ -335,7 +332,7 @@ namespace MR {
         TVec3f stack_2c = *getPlayerCenterPos();
         TVec3f upVec;
         calcUpVec(&upVec, pActor);
-        TVec3f stack_14 = pActor->mPosition + upVec.scaleInline(a2);
+        TVec3f stack_14 = pActor->mPosition + upVec * a2;
         stack_2c.sub(stack_14);
         normalizeOrZero(&stack_2c);
         f32 f1 = upVec.dot(stack_2c);
@@ -352,7 +349,7 @@ namespace MR {
         TVec3f stack_2c = *getPlayerCenterPos();
         TVec3f upVec;
         calcUpVec(&upVec, pActor);
-        TVec3f stack_14 = pActor->mPosition + upVec.scaleInline(a2);
+        TVec3f stack_14 = pActor->mPosition + upVec * a2;
         stack_2c.sub(stack_14);
         normalizeOrZero(&stack_2c);
         return (a3 < upVec.dot(stack_2c));
@@ -363,7 +360,7 @@ namespace MR {
         TVec3f upVec;
         calcUpVec(&upVec, pActor);
         upVec = -upVec;
-        TVec3f stack_14 = pActor->mPosition + upVec.scaleInline(a2);
+        TVec3f stack_14 = pActor->mPosition + upVec * a2;
         stack_38.sub(stack_14);
         normalizeOrZero(&stack_38);
         return (a3 < upVec.dot(stack_38));
@@ -631,7 +628,7 @@ namespace MR {
     }
 
     void addVelocityJump(LiveActor* pActor, f32 a2) {
-        (pActor->mVelocity).add(pActor->mGravity.scaleInline(-a2));
+        (pActor->mVelocity).add(pActor->mGravity * -a2);
     }
 
     bool addVelocityLimit(LiveActor* pActor, const TVec3f& a2) {
@@ -645,19 +642,16 @@ namespace MR {
         if (stack_8 <= f1) {
             return false;
         }
-        f32 f31 = stack_8 - f1;
-        TVec3f stack_c(stack_18);
-        stack_c.scale(f31);
-        pActor->mVelocity.add(stack_c);
+        pActor->mVelocity.add(stack_18 * (stack_8 - f1));
         return true;
     }
 
     void setVelocityJump(LiveActor* pActor, f32 a2) {
-        (pActor->mVelocity).set(pActor->mGravity.scaleInline(-a2));
+        (pActor->mVelocity).set(pActor->mGravity * -a2);
     }
 
     void addVelocityToGravity(LiveActor* pActor, f32 a2) {
-        (pActor->mVelocity).add(pActor->mGravity.scaleInline(a2));
+        (pActor->mVelocity).add(pActor->mGravity * a2);
     }
 
     void addVelocityToGravityOrGround(LiveActor* pActor, f32 a2) {
@@ -677,7 +671,7 @@ namespace MR {
                 return false;
             }
             normalize(&stack_14);
-            (pActor->mVelocity).add(stack_14.scaleInline(a2));
+            (pActor->mVelocity).add(stack_14 * a2);
             return true;
         }
     }
@@ -742,7 +736,7 @@ namespace MR {
         TVec3f stack_2c;
         stack_2c.rejection(a2, pActor->mGravity);
         normalizeOrZero(&stack_2c);
-        TVec3f stack_20 = stack_2c.scaleInline(a3) - pActor->mGravity.scaleInline(a4);
+        TVec3f stack_20 = stack_2c * a3 - pActor->mGravity * a4;
         pActor->mVelocity.add(stack_20);
     }
 
@@ -750,7 +744,7 @@ namespace MR {
         TVec3f stack_2c;
         stack_2c.rejection(a2, pActor->mGravity);
         normalizeOrZero(&stack_2c);
-        TVec3f stack_20 = stack_2c.scaleInline(a3) - pActor->mGravity.scaleInline(a4);
+        TVec3f stack_20 = stack_2c * a3 - pActor->mGravity * a4;
         pActor->mVelocity.set(stack_20);
     }
 
@@ -810,8 +804,8 @@ namespace MR {
             if (0.0f != a2) {
                 f1 -= a2;
             }
-            stack_20.set(pActor->mGravity.scaleInline(f1));
-            addVelocityLimit(pActor, stack_20.scaleInline(a3));
+            stack_20.set(pActor->mGravity * f1);
+            addVelocityLimit(pActor, stack_20 * a3);
         }
     }
 
@@ -836,11 +830,11 @@ namespace MR {
         f31 = bindedReactnVec.dot(pActor->mVelocity);
         f32 f0 = -a5;
         if (f31 < f0) {
-            pActor->mVelocity.sub(bindedReactnVec.scaleInline(f31).scaleInline(1.0f + f30));
+            pActor->mVelocity.sub(bindedReactnVec * f31 * (1.0f + f30));
             return true;
         }
         if (f31 < 0.0f) {
-            pActor->mVelocity.sub(bindedReactnVec.scaleInline(f31));
+            pActor->mVelocity.sub(bindedReactnVec * f31);
             return false;
         }
         return false;
@@ -857,13 +851,13 @@ namespace MR {
         normalize(&bindedReactnVec);
         f32 f31 = bindedReactnVec.dot(pActor->mVelocity);
         if (f31 < -a3) {
-            pActor->mVelocity.sub(bindedReactnVec.scaleInline(f31));
+            pActor->mVelocity.sub(bindedReactnVec * f31);
             pActor->mVelocity.scale(a4);
-            pActor->mVelocity.sub(bindedReactnVec.scaleInline(f31).scaleInline(a2));
+            pActor->mVelocity.sub(bindedReactnVec * f31 * a2);
             return true;
         }
         if (f31 < 0.0f) {
-            pActor->mVelocity.sub(bindedReactnVec.scaleInline(f31));
+            pActor->mVelocity.sub(bindedReactnVec * f31);
             return false;
         }
         return false;
@@ -898,7 +892,7 @@ namespace MR {
         TVec3f stack_38;
         TVec3f stack_2c;
         if (!isBindedGround(pActor)) {
-            pActor->mVelocity.add(pActor->mGravity.scaleInline(a2));
+            pActor->mVelocity.add(pActor->mGravity * a2);
         }
         TVec3f* pVelocity = &pActor->mVelocity;
         TVec3f* pGravThenVel = &pActor->mGravity;
@@ -985,7 +979,7 @@ namespace MR {
         if (((1.0f + a4) * pActor->mVelocity.dot(stack_14)) > 0.0f) {
             return false;
         }
-        pActor->mVelocity.sub(stack_14.scaleInline(a4));
+        pActor->mVelocity.sub(stack_14 * a4);
         return true;
     }
 
@@ -1131,7 +1125,7 @@ namespace MR {
         TVec3f stack_20;
         calcMovingDirectionAlongRail(pActor, &stack_20, pActor->mPosition, a3, a8, nullptr);
         turnVecToVecDegree(a2, *a2, stack_20, a7, TVec3f(0, 1, 0));
-        pActor->mVelocity.add(a2->scaleInline(a4));
+        pActor->mVelocity.add(*a2 * a4);
         pActor->mVelocity.scale(a6);
         reboundVelocityFromCollision(pActor, 0.0f, 0.0f, 1.0f);
         addVelocityToGravityOrGround(pActor, a5);

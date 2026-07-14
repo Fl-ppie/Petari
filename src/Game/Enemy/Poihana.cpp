@@ -155,10 +155,8 @@ Poihana::~Poihana() {
 }*/
 
 void Poihana::initAfterPlacement() {
-    TVec3f gravityNegated;
-    JGeometry::negateInternal((f32*)&mGravity, (f32*)&gravityNegated);
     TPos3f baseMtx;
-    MR::makeMtxUpNoSupportPos(&baseMtx, gravityNegated, mPosition);
+    MR::makeMtxUpNoSupportPos(&baseMtx, -mGravity, mPosition);
     MR::setBaseTRMtx(this, baseMtx);
     MR::calcFrontVec(&mFrontVec, this);
     MR::trySetMoveLimitCollision(this);
@@ -809,7 +807,7 @@ void Poihana::contactMario(HitSensor* pSender, HitSensor* pReceiver) {
     if (!isNerve(&NrvPoihana::PoihanaNrvShock::sInstance)) {
         f32 magVel = isNerve(&NrvPoihana::PoihanaNrvChasePlayer::sInstance) ? 10.0f : 5.0f;
 
-        if (PSVECMag((Vec *)&mVelocity) > magVel) {
+        if (mVelocity.length() > magVel) {
             f32 squared = mVelocity.squared();
 
             if (squared > 0.0000038146973f) {
@@ -947,7 +945,7 @@ bool Poihana::isNeedForGetUp() const {
     if (MR::isNearPlayer(this, 500.0f)) {
         bool flag = true;
 
-        f32 mag = PSVECMag(MR::getPlayerVelocity());
+        f32 mag = MR::getPlayerVelocity()->length();
 
         if (!(mag >= 10.0f) && !MR::isPlayerSwingAction()) {
             flag = false;
@@ -964,8 +962,7 @@ bool Poihana::isNeedForGetUp() const {
 bool Poihana::isBackAttack(HitSensor* pMySensor) const {
     TVec3f frontVec;
     MR::calcFrontVec(&frontVec, this);
-    JGeometry::negateInternal((f32*)&frontVec, (f32*)&frontVec);
+    frontVec.negate();
 
-    TVec3f sensorRelative(pMySensor->mPosition - mPosition);
-    return sensorRelative.dot(frontVec) > 0.0f;
+    return (pMySensor->mPosition - mPosition).dot(frontVec) > 0.0f;
 }

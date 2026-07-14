@@ -54,7 +54,7 @@ void AstroDomeBlueStar::CaptureActor::updateTransTraction(const TVec3f& rBasePos
     if (mPosition.distance(rTarget) < dist) {
         pos.set(rTarget);
     } else {
-        pos.add(mPosition, dir.multInLine(dist));
+        pos.add(mPosition, dir * dist);
     }
 
     MR::makeMtxUpNoSupportPos(&_8C, dir, pos);
@@ -228,7 +228,7 @@ void AstroDomeBlueStar::calcZoomInPos(TVec3f* zoomVec) const {
     TVec3f vec;
     TPos3f pos;
     SphereSelectorFunction::calcHandledRotateMtx(TVec3f(0.0f, 0.0f, 0.0f), &pos);
-    pos.getYDirInline(vec);
+    pos.getYDir(vec);
     cameraRelative.sub(SphereSelectorFunction::getSelectedActorTrans(), MR::getCamPos());
 
     SphereSelectorFunction::calcOffsetPos(zoomVec, SphereSelectorFunction::getSelectedActorTrans(), TVec3f(::cZoomInOffset), cameraRelative, vec);

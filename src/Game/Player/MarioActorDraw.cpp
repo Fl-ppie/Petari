@@ -1,12 +1,15 @@
 #include "Game/LiveActor/ModelManager.hpp"
 #include "Game/MapObj/IceStep.hpp"
 #include "Game/Player/DLchanger.hpp"
+#include "Game/Player/DrawAdaptor.hpp"
 #include "Game/Player/J3DModelX.hpp"
 #include "Game/Player/MarioActor.hpp"
 #include "Game/Player/MarioAnimator.hpp"
 #include "Game/Player/MarioParts.hpp"
+#include "Game/Player/MarioState.hpp"
 #include "Game/Player/ModelHolder.hpp"
 #include "Game/Player/TornadoMario.hpp"
+#include "Game/Scene/SceneFunction.hpp"
 #include "Game/Util/ActorShadowUtil.hpp"
 #include "Game/Util/CameraUtil.hpp"
 #include "Game/Util/FileUtil.hpp"
@@ -26,14 +29,13 @@
 #include "JSystem/JUtility/JUTNameTab.hpp"
 #include "JSystem/JUtility/JUTTexture.hpp"
 #include <cstring>
-#include <new>
 #include <revolution/gd/GDBase.h>
 
 namespace MR {
     void showMaterial(J3DModel*, const char*);
     template < class T >
     FunctorV0M< const T*, void (T::*)() const > Functor(const T*, void (T::*)() const) NO_INLINE;
-}  // namespace MR
+};  // namespace MR
 
 extern "C" {
 void GDSetTexImgPtr(GXTexMapID, void*);
@@ -43,11 +45,6 @@ struct DLholder {
     u8* mDL;
     u16 mSize;
     u16 _6;
-};
-
-class DrawAdaptor {
-public:
-    DrawAdaptor(const MR::FunctorBase&, int);
 };
 
 class JetTurtleShadow : public LiveActor {
@@ -94,51 +91,11 @@ namespace {
 };  // namespace
 
 void MarioActor::initDrawAndModel() {
-    DrawAdaptor* adaptor = nullptr;
-
-    void* mem = ::operator new(0x10);
-    if (mem) {
-        MR::FunctorV0M< const MarioActor*, void (MarioActor::*)() const > functor =
-            MR::Functor(static_cast< const MarioActor* >(this), &MarioActor::drawShadow);
-        adaptor = new (mem) DrawAdaptor(functor, 0x29);
-    }
-    _218 = adaptor;
-
-    adaptor = nullptr;
-    mem = ::operator new(0x10);
-    if (mem) {
-        MR::FunctorV0M< const MarioActor*, void (MarioActor::*)() const > functor =
-            MR::Functor(static_cast< const MarioActor* >(this), &MarioActor::drawSilhouette);
-        adaptor = new (mem) DrawAdaptor(functor, 0x28);
-    }
-    _21C = adaptor;
-
-    adaptor = nullptr;
-    mem = ::operator new(0x10);
-    if (mem) {
-        MR::FunctorV0M< const MarioActor*, void (MarioActor::*)() const > functor =
-            MR::Functor(static_cast< const MarioActor* >(this), &MarioActor::drawPreWipe);
-        adaptor = new (mem) DrawAdaptor(functor, 0x41);
-    }
-    _220 = adaptor;
-
-    adaptor = nullptr;
-    mem = ::operator new(0x10);
-    if (mem) {
-        MR::FunctorV0M< const MarioActor*, void (MarioActor::*)() const > functor =
-            MR::Functor(static_cast< const MarioActor* >(this), &MarioActor::drawScreenBlend);
-        adaptor = new (mem) DrawAdaptor(functor, 0x2F);
-    }
-    _228 = adaptor;
-
-    adaptor = nullptr;
-    mem = ::operator new(0x10);
-    if (mem) {
-        MR::FunctorV0M< const MarioActor*, void (MarioActor::*)() const > functor =
-            MR::Functor(static_cast< const MarioActor* >(this), &MarioActor::drawIndirect);
-        adaptor = new (mem) DrawAdaptor(functor, 0x24);
-    }
-    _22C = adaptor;
+    _218 = new DrawAdaptor(MR::Functor(this, &MarioActor::drawShadow), MR::DrawType_AlphaShadow);
+    _21C = new DrawAdaptor(MR::Functor(this, &MarioActor::drawSilhouette), MR::DrawType_0x28);
+    _220 = new DrawAdaptor(MR::Functor(this, &MarioActor::drawPreWipe), MR::DrawType_CometScreenFilter);
+    _228 = new DrawAdaptor(MR::Functor(this, &MarioActor::drawScreenBlend), MR::DrawType_CenterScreenBlur);
+    _22C = new DrawAdaptor(MR::Functor(this, &MarioActor::drawIndirect), MR::DrawType_0x24);
 
     if (gIsLuigi) {
         initModelManagerWithAnm("Luigi", "MarioAnime", true);
@@ -263,7 +220,7 @@ void MarioActor::initBeeMario() {
     _9E8->initFixedPosition(_DDC.toMtxPtr(), localRot, localTrans);
     _9E8->makeActorDead();
 
-    _9F0 = false;
+    _9F0 = 0;
     _3D2 |= 0x10;
 }
 
@@ -530,7 +487,7 @@ void MarioActor::calcViewAndEntry() {
         calcViewFootPrint();
     }
 
-    if (mMario->isStatusActive(0x12)) {
+    if (mMario->isStatusActive(MarioStatus_FpView)) {
         calc1stPersonView();
     } else {
         calcFogLighting();
@@ -629,7 +586,7 @@ void MarioActor::updateFace() {
         return;
     }
 
-    if (mMario->isStatusActive(0x12)) {
+    if (mMario->isStatusActive(MarioStatus_FpView)) {
         MR::hideModel(_A5C);
         return;
     }
@@ -790,7 +747,7 @@ void MarioActor::changeDisplayMode(u8 mode) {
     }
 
     MtxPtr handMtx = MR::getJointMtx(this, "HandR");
-    _4A0->setBaseMtx(handMtx);
+    mSearchLightThrowPos->setBaseMtx(handMtx);
 }
 
 void MarioActor::calcViewMainModel() {
@@ -885,7 +842,7 @@ void MarioActor::drawIndirectModel() const {
     }
 
     model->mFlags._1C = false;
-    if (mMario->isStatusActive(0x12)) {
+    if (mMario->isStatusActive(MarioStatus_FpView)) {
         if (_1A1) {
             return;
         }
@@ -1070,7 +1027,7 @@ void MarioActor::drawMarioModel() const {
 
     if (!mFlag.mIsHiddenModel) {
         model->mFlags._1C = false;
-        if (mMario->isStatusActive(0x12)) {
+        if (mMario->isStatusActive(MarioStatus_FpView)) {
             if (_1A1) {
                 return;
             }
@@ -1097,7 +1054,7 @@ void MarioActor::drawMarioModel() const {
         model->mFlags.clear();
     }
 
-    if (mMario->isStatusActive(0x12)) {
+    if (mMario->isStatusActive(MarioStatus_FpView)) {
         MR::hideJoint(model, "HandR0");
         MR::hideJoint(model, "HandL0");
         MR::hideJoint(model, "Face0");

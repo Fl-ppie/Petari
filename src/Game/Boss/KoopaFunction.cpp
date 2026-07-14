@@ -73,11 +73,11 @@ void KoopaFunction::setKoopaPos(Koopa* pKoopa, const char* pDemoName) {
     MR::findNamePos(pDemoName, transform);
 
     TVec3f yDir;
-    transform.getYDirInline(yDir);
+    transform.getYDir(yDir);
 
-    pKoopa->mGravity.set(yDir.negateInline());
-    transform.getZDirInline(pKoopa->mFront);
-    transform.getTransInline(pKoopa->mPosition);
+    pKoopa->mGravity.set(-yDir);
+    transform.getZDir(pKoopa->mFront);
+    transform.getTrans(pKoopa->mPosition);
 
     bool isCalcGravity = MR::isCalcGravity(pKoopa);
     MR::offCalcGravity(pKoopa);
@@ -353,7 +353,7 @@ namespace {
         MR::startAction(pKoopa, pName);
 
         if (isMario) {
-            MR::startBckPlayer(pName, static_cast< char* >(nullptr));
+            MR::startBckPlayer(pName, static_cast< const char* >(nullptr));
         }
 
         MR::startAnimCameraTargetSelf(pKoopa, pKoopa->mParts->mActorCameraInfo, pName, 0, 1.0f);

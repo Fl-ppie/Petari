@@ -56,7 +56,7 @@ namespace {
     static const f32 hIceInitBlowVelV = 100.0f;
     static const f32 hKickCheckOffsetUp = 0.0f;
     static const f32 hIceInitBlowVelH = 0.0f;
-}  // namespace
+};  // namespace
 
 namespace NrvSpinningBox {
     NEW_NERVE(HostTypeNrvFall, SpinningBox, Fall);
@@ -64,7 +64,7 @@ namespace NrvSpinningBox {
     NEW_NERVE_ONEND(HostTypeNrvSliding, SpinningBox, Sliding, Sliding);
     NEW_NERVE_ONEND(HostTypeNrvSpinning, SpinningBox, Spinning, Spinning);
     NEW_NERVE_ONEND(HostTypeNrvPointed, SpinningBox, Pointed, Pointed);
-}  // namespace NrvSpinningBox
+};  // namespace NrvSpinningBox
 
 void FORCE_MATCH_SDATA2() {
     f32 f1 = 1.0f;
@@ -111,7 +111,7 @@ void SpinningBox::init(const JMapInfoIter& rIter) {
     initSound(6, false);
 
     MR::onCalcGravity(this);
-    MR::initShadowVolumeBox(this, TVec3f(::sShadowSize, -70.0f, ::sShadowSize).scaleInline(scale), getBaseMtx());
+    MR::initShadowVolumeBox(this, TVec3f(::sShadowSize, -70.0f, ::sShadowSize) * scale, getBaseMtx());
     MR::excludeCalcShadowToMyCollision(this, nullptr);
 
     if (MR::isValidInfo(rIter)) {
@@ -133,7 +133,7 @@ void SpinningBox::kill() {
     MR::startSound(this, "SE_OJ_SPIN_BOX_BREAK");
     MR::startSound(this, "SE_OJ_STAR_PIECE_BURST");
     LiveActor::kill();
-    MR::appearStarPiece(this, mPosition - mGravity.scaleInline(50.0f), MR::getDeclareRemnantStarPieceCount(this), 10.0f, 40.0f, false);
+    MR::appearStarPiece(this, mPosition - mGravity * 50.0f, MR::getDeclareRemnantStarPieceCount(this), 10.0f, 40.0f, false);
     MR::emitEffect(this, "Break");
 }
 
@@ -250,7 +250,7 @@ void SpinningBox::exeSliding() {
     MR::reboundVelocityFromCollision(this, 0.0f, 0.0f, 1.0f);
 
     MR::vecKillElement(mVelocity, mSlideDir, &mVelocity);
-    mVelocity = mSlideDir.scaleInline(mSlideSpeed);
+    mVelocity = mSlideDir * mSlideSpeed;
 
     if (!MR::isOnGround(this)) {
         MR::forceBindOnGround(this, ::hForceBindOffset, ::hForceBindMul);
@@ -311,7 +311,7 @@ void SpinningBox::exeSpinning() {
     MR::reboundVelocityFromCollision(this, 0.0f, 0.0f, 1.0f);
 
     MR::vecKillElement(mVelocity, mSlideDir, &mVelocity);
-    mVelocity = mSlideDir.scaleInline(mSlideSpeed);
+    mVelocity = mSlideDir * mSlideSpeed;
 
     if (!MR::isOnGround(this)) {
         MR::forceBindOnGround(this, ::hForceBindOffset, ::hForceBindMul);
@@ -350,7 +350,7 @@ void SpinningBox::endPointed() {
 }
 
 void SpinningBox::calcPlanarProjectedVec(TVec3f* pProj, const TVec3f& rNorm, const TVec3f& rGrav) {
-    pProj->add(rGrav.scaleInline(-rNorm.dot(*pProj) / rNorm.dot(rGrav)));
+    pProj->add(rGrav * (-rNorm.dot(*pProj) / rNorm.dot(rGrav)));
 }
 
 void SpinningBox::calcHitDirection(const TVec3f& rPos) {
@@ -378,8 +378,8 @@ void SpinningBox::generateIceBox(HitSensor* pSender, HitSensor* pReceiver) {
     mPosition.set(pReceiver->mHost->mPosition);
     TPos3f mtx = pReceiver->mHost->getBaseMtx();
     TVec3f up, front;
-    mtx.getYDirInline(up);
-    mtx.getZDirInline(front);
+    mtx.getYDir(up);
+    mtx.getZDir(front);
 
     MR::makeQuatFromVec(&mRotate, front, up);
 
@@ -387,7 +387,7 @@ void SpinningBox::generateIceBox(HitSensor* pSender, HitSensor* pReceiver) {
     TVec3f dir = pReceiver->mPosition - pSender->mPosition;
     MR::vecKillElement(dir, grav, &dir);
     dir.setLength(::hIceInitBlowVelH);
-    dir.add((-grav).scaleInline(::hIceInitBlowVelV));
+    dir.add((-grav) * (::hIceInitBlowVelV));
     mVelocity.set(dir);
 
     if (::hPlayerVelocityCheck < MR::getPlayerVelocity()->length()) {

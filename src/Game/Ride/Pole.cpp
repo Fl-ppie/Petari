@@ -82,9 +82,9 @@ void Pole::init(const JMapInfoIter& rIter) {
     mtx.identity();
     MR::makeMtxTR(mtx.toMtxPtr(), this);
 
-    mtx.getXDirInline(mSide);
-    mtx.getYDirInline(mUp);
-    mtx.getZDirInline(mFront);
+    mtx.getXDir(mSide);
+    mtx.getYDir(mUp);
+    mtx.getZDir(mFront);
 
     mPosMtx.set(mtx);
     mPosMtx.invert(mPosMtx);
@@ -392,8 +392,7 @@ void Pole::exeBindFallDown() {
         front.z = JMACosDegree(mRotation.y);
         mtx.mult(front, front);
 
-        TVec3f pos(front);
-        pos.scale(-30.0f);
+        TVec3f pos(front * -30.0f);
         pos.add(mBasePos);
 
         MR::setPlayerPos(pos);
@@ -595,12 +594,12 @@ bool Pole::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver) {
         TPos3f posMtx;
         TRot3f rotMtx;
         posMtx.identity();
-        posMtx.setVec(mSide, mUp, mFront);
+        posMtx.setXYZDir(mSide, mUp, mFront);
 
         rotMtx.identity();
         MR::makeMtxTransRotateY(rotMtx.toMtxPtr(), this);
         PSMTXConcat(posMtx.toMtxPtr(), rotMtx.toMtxPtr(), posMtx.toMtxPtr());
-        posMtx.setPos(mPosition);
+        posMtx.setTrans(mPosition);
         MR::setBaseTRMtx(mRider, posMtx);
         return true;
     }
@@ -651,8 +650,7 @@ bool Pole::tryJump(bool handstand, f32 angleOffset) {
         MR::endActorCamera(this, mCameraInfo, 1, -1);
 
         if (mIsSquare) {
-            TVec3f vec2(jumpFront);
-            vec2.scale(50.0f);
+            TVec3f vec2(jumpFront * 50.0f);
             vec2.add(*MR::getPlayerPos());
             MR::setPlayerPos(vec2);
         }
@@ -673,9 +671,9 @@ bool Pole::tryJump(bool handstand, f32 angleOffset) {
 bool Pole::tryTurn() {
     if (isEnableTurn()) {
         if (getPoleSubPadStickX() > 0.0f) {
-            setNerve(&NrvPole::PoleNrvBindTurnLeft::sInstance);
-        } else {
             setNerve(&NrvPole::PoleNrvBindTurnRight::sInstance);
+        } else {
+            setNerve(&NrvPole::PoleNrvBindTurnLeft::sInstance);
         }
         return true;
     }

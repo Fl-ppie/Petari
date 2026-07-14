@@ -82,10 +82,10 @@ void DesertLandMoveSwitch::calcAnim() {
     f32 val = mSpringValue->mSpringValue;
     if (!MR::isNearZero(val)) {
         TVec3f pos, up;
-        mtx2.getTransInline(pos);
+        mtx2.getTrans(pos);
         MR::calcUpVec(&up, this);
-        pos += up.multInLine(val);
-        mtx2.setTransInline(pos);
+        pos += up * val;
+        mtx2.setTrans(pos);
         PSMTXCopy(mtx2, mtx);
     }
     mCollisionParts->setMtx(mtx2);
@@ -127,7 +127,7 @@ void DesertLandMoveSwitch::initModelAndCollision(const JMapInfoIter& rIter) {
     HitSensor* sensorBody = MR::addHitSensorMapObj(this, "body", 8, 0.0f, TVec3f(0.0f, 0.0f, 0.0f));
     HitSensor* sensorMove = MR::addHitSensorMapObj(this, "move", 8, 0.0f, TVec3f(0.0f, 0.0f, 0.0f));
     MR::initCollisionParts(this, pObjName, sensorBody, 0);
-    mCollisionParts = MR::createCollisionPartsFromLiveActor(this, "Move", sensorMove, MR::UNKNOWN_2);
+    mCollisionParts = MR::createCollisionPartsFromLiveActor(this, "Move", sensorMove, MR::CollisionScaleType_Unk2);
     MR::validateCollisionParts(mCollisionParts);
 }
 

@@ -74,7 +74,7 @@ bool DiskGravity::calcOwnGravityVector(TVec3f* pDest, f32* pDistance, const TVec
     f32 distance = 0.0f;
 
     if (distanceToCentralAxis <= mWorldRadius) {
-        gravity = centralAxisY >= 0.0f ? mWorldNormal.negateInline() : mWorldNormal;
+        gravity = centralAxisY >= 0.0f ? -mWorldNormal : mWorldNormal;
         distance = __fabsf(centralAxisY);
     } else {
         if (!mEnableEdgeGravity) {
@@ -136,7 +136,7 @@ void DiskGravity::updateLocalParam() {
     }
 
     rot.identity();
-    rot.setRotateInline(mLocalNormal, 0.5f * mValidDegree * (PI / 180));
+    rot.setRotate(mLocalNormal, 0.5f * mValidDegree * (PI / 180));
     rArtifact = false;
     if (!artifact) {
         rot.mult(mOppositeSideVecOrtho, mOppositeSideVecOrtho);

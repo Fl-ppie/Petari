@@ -43,9 +43,9 @@ void JumpBranch::init(const JMapInfoIter& rIter) {
     posMtx.identity();
     MR::makeMtxTR(reinterpret_cast< MtxPtr >(&posMtx), this);
 
-    posMtx.getXDirInline(mSide);
-    posMtx.getYDirInline(mUp);
-    posMtx.getZDirInline(mFront);
+    posMtx.getXDir(mSide);
+    posMtx.getYDir(mUp);
+    posMtx.getZDir(mFront);
 
     initModelManagerWithAnm("JumpBranch", nullptr, false);
 
@@ -142,7 +142,7 @@ bool JumpBranch::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiv
         f32 dotUp = mUp.dot(diff);
         f32 dotFront = mFront.dot(diff);
 
-        diff.set(mUp.scaleInline(dotUp) + mFront.scaleInline(dotFront));
+        diff.set(mUp * dotUp + mFront * dotFront);
 
         if (MR::isNearZero(diff)) {
             diff.set(mFront);
@@ -161,8 +161,7 @@ bool JumpBranch::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiv
 
         TVec3f swingVelocity(0.0f, 0.0f, 0.0f);
 
-        TVec3f grabFront;
-        PSVECCrossProduct(&grabUp, &mSide, &grabFront);
+        TVec3f grabFront = grabUp.cross(mSide);
 
         if (mSwingReverse) {
             grabFront.scale(-1.0f);
@@ -208,7 +207,7 @@ bool JumpBranch::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiv
         TVec3f swingSide(mSwingPoint->mSide);
         TVec3f swingFront(mSwingPoint->mFront);
 
-        posMtx.setVecAndTransInline(swingSide, mSwingPoint->mUp, swingFront, mPosition);
+        posMtx.setTR(swingSide, mSwingPoint->mUp, swingFront, mPosition);
 
         MR::setBaseTRMtx(mRider, posMtx);
         return true;
@@ -268,9 +267,7 @@ bool JumpBranch::updateBind() {
         return true;
     }
 
-    TVec3f grav(mGravity);
-    grav.scale(0.2f);
-    mSwingPoint->addAccel(grav);
+    mSwingPoint->addAccel(mGravity * 0.2f);
     mSwingPoint->strain(mPosition, 30.0f);
     mSwingPoint->updatePosAndAxis(mSwingPoint->mFront, 0.995f);
     return false;

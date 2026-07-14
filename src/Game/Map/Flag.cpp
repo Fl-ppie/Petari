@@ -138,7 +138,7 @@ void Flag::init(const JMapInfoIter& rIter) {
         for (s32 idxU = 0; idxU < mNumPointsU; idxU++) {
             TVec3f posU = pos;
             if (mIsVerticalFlag) {
-                posU.add(mGravity.scaleInline(mPointIntervalU * (idxU + 1)));
+                posU.add(mGravity * (mPointIntervalU * (idxU + 1)));
             }
             mFixPoints[idxV].mPoints[idxU] = new SwingRopePoint(posU);
         }
@@ -174,12 +174,12 @@ void Flag::init(const JMapInfoIter& rIter) {
     initSound(4, false);
 
     if (MR::isEqualString(mObjName, "FlagKoopaCastle")) {
-        mClipCenter = mUp.scaleInline(500.0f) + mPosition;
+        mClipCenter = mUp * 500.0f + mPosition;
         MR::setClippingTypeSphere(this, 500.0f + ::sClippingRadiusOffset, &mClipCenter);
     } else if (mStickLength > 0.0f) {
         if (mBasePos == nullptr && mBaseMtx == nullptr) {
             // TODO: I dont think they use both "* 0.5f" and "/ 2"
-            mClipCenter = mUp.scaleInline(mStickLength * 0.5f) + mPosition;
+            mClipCenter = mUp * (mStickLength * 0.5f) + mPosition;
             MR::setClippingTypeSphere(this, mStickLength / 2 + ::sClippingRadiusOffset, &mClipCenter);
         } else {
             MR::setClippingTypeSphere(this, mStickLength + ::sClippingRadiusOffset);
@@ -289,7 +289,7 @@ void Flag::updateFlag() {
 
     if (mBaseMtx != nullptr) {
         mBaseMtx->getTransInline2(mPosition);
-        mBaseMtx->getYDirInline2(mUp);
+        mBaseMtx->getYDir2(mUp);
 
         for (s32 idxV = 0; idxV < mNumPointsV; idxV++) {
             TVec3f pos = mUp;
@@ -308,7 +308,7 @@ void Flag::updateFlag() {
             point->addAccel(grav);
 
             TVec3f side = mSide;
-            f32 wave = JMASinDegree(mWavePhase + ::sWindPosRateU * idxU + ::sWindPosRateV * idxV);
+            f32 wave = MR::sinDegree(mWavePhase + ::sWindPosRateU * idxU + ::sWindPosRateV * idxV);
             if (wave < 0.0f) {
                 wave *= -1.0f;
             }
@@ -430,7 +430,7 @@ void Flag::draw() const {
             TVec3f v2(stickCoords[idx].x, 0.0f, stickCoords[idx].y);
             v1.scale(::sStickWidth);
             v2.scale(::sStickWidth);
-            TVec3f posA = mUp.scaleInline(length);
+            TVec3f posA = mUp * length;
             posA.add(v1);
             posA.add(v2);
             posA.add(mPosition);

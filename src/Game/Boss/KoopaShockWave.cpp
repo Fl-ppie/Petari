@@ -82,13 +82,7 @@ void KoopaShockWave::makeActorDead() {
 
 namespace {
     void makeShockWaveMtx(TPos3f* pDest, const TVec3f& rUp, const TVec3f& rFront, const TVec3f& r6, f32 f1, f32 f2) NO_INLINE {
-        TVec3f localVec = rUp;
-        localVec.scale(f1);
-        TVec3f localVec2 = localVec;
-        localVec2.scale(f2);
-        TVec3f localVec3 = localVec2;
-        localVec3.add(r6);
-        MR::makeMtxUpFrontPos(pDest, rUp, rFront, localVec3);
+        MR::makeMtxUpFrontPos(pDest, rUp, rFront, rUp * f1 * f2 + r6);
     }
 };  // namespace
 
@@ -118,7 +112,7 @@ void KoopaShockWave::exeWaveAttack() {
 
         vec2.add(KoopaFunction::getPlanetCenterPos(mKoopa));
 
-        MR::makeMtxUpFrontPos(&_94, mKoopa->mGravity.negateInline(), mKoopa->mFront, vec2);
+        MR::makeMtxUpFrontPos(&_94, -mKoopa->mGravity, mKoopa->mFront, vec2);
 
         MR::startSound(mKoopa, "SE_BM_KOOPA_SWAVE_SHOOT");
 
@@ -154,7 +148,7 @@ void KoopaShockWave::updateHitSensor(HitSensor* pSensor) {
     TVec3f playerPos = *MR::getPlayerPos();
     MR::calcLocalVec(&playerPos, _94);
 
-    f32 degree = MR::toDegree(JMAATan2(-playerPos.z, playerPos.x)) + 180.0f;
+    f32 degree = MR::toDegree(MR::atan2(-playerPos.z, playerPos.x)) + 180.0f;
 
     TPos3f matrix = _94;
     matrix.setTrans(KoopaFunction::getPlanetCenterPos(mKoopa));

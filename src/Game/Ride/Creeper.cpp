@@ -22,12 +22,6 @@
 #include <revolution/mtx.h>
 #include <revolution/wpad.h>
 
-namespace {
-    static Color8 sColorPlusZ(0xFF, 0xFF, 0xFF, 0xFF);
-    static Color8 sColorPlusX(0x96, 0x96, 0x96, 0xFF);
-    static Color8 sColorMinusX(0xC8, 0xC8, 0xC8, 0xFF);
-};  // namespace
-
 namespace NrvCreeper {
     NEW_NERVE(CreeperNrvFree, Creeper, Free);
     NEW_NERVE(CreeperNrvFreeInvalid, Creeper, FreeInvalid);
@@ -36,12 +30,23 @@ namespace NrvCreeper {
     NEW_NERVE(CreeperNrvHangDown, Creeper, HangDown);
 };  // namespace NrvCreeper
 
+namespace {
+    static Color8 sColorPlusZ(0xFF, 0xFF, 0xFF, 0xFF);
+    static Color8 sColorPlusX(0x96, 0x96, 0x96, 0xFF);
+    static Color8 sColorMinusX(0xC8, 0xC8, 0xC8, 0xFF);
+};  // namespace
+
+void Creeoer_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)-1.0f;
+}
+
 CreeperPoint::CreeperPoint(const TVec3f& rPos, const TVec3f& rUp, const CreeperPoint* pPrevPoint)
     : mPosition(rPos), mNeutralPos(rPos), mVelocity(0.0f, 0.0f, 0.0f), mSide(1.0f, 0.0f, 0.0f), mUp(rUp), mFront(0.0f, 0.0f, 1.0f),
       mProjection(0.0f, 0.0f, 0.0f), mPrevPoint(pPrevPoint) {
-    TVec3f front;
-    PSVECCrossProduct(&mSide, &mUp, &front);
-    if (MR::isNearZero(front, 0.001f)) {
+    TVec3f front = mSide.cross(mUp);
+    if (MR::isNearZero(front)) {
         MR::makeAxisUpFront(&mSide, &mFront, mUp, mFront);
     } else {
         MR::makeAxisUpSide(&mFront, &mSide, mUp, mSide);
@@ -51,21 +56,16 @@ CreeperPoint::CreeperPoint(const TVec3f& rPos, const TVec3f& rUp, const CreeperP
         return;
     }
 
-    TVec3f posDiff(mPosition);
-    posDiff.sub(pPrevPoint->mPosition);
+    TVec3f posDiff = mPosition - pPrevPoint->mPosition;
     mProjection.x = pPrevPoint->mSide.dot(posDiff);
     mProjection.y = pPrevPoint->mUp.dot(posDiff);
     mProjection.z = pPrevPoint->mFront.dot(posDiff);
 }
 
 void CreeperPoint::updateFree() {
-    TVec3f restoreVec(mNeutralPos);
-    restoreVec.sub(mPosition);
+    TVec3f restoreVec(mNeutralPos - mPosition);
 
-    TVec3f v2(restoreVec);
-    v2.scale(0.05f);
-
-    mVelocity.add(v2);
+    mVelocity.add(restoreVec * 0.05f);
 
     mPosition.add(mVelocity);
 
@@ -83,11 +83,10 @@ void CreeperPoint::updateBend(bool bend, const TVec3f& bendDirection, f32 t, f32
     mVelocity.mult(0.7f);
 
     if (bend) {
-        mVelocity.add(bendDirection.scaleInline(t).scaleInline(bendFactor));
+        mVelocity.add(bendDirection * t * bendFactor);
     }
 
-    mPosition = mPrevPoint->mSide.scaleInline(mProjection.x) + mPrevPoint->mUp.scaleInline(mProjection.y) +
-                mPrevPoint->mFront.scaleInline(mProjection.z) + mPrevPoint->mPosition;
+    mPosition = mPrevPoint->mSide * mProjection.x + mPrevPoint->mUp * mProjection.y + mPrevPoint->mFront * mProjection.z + mPrevPoint->mPosition;
 
     mPosition.add(mVelocity);
 
@@ -104,9 +103,8 @@ void CreeperPoint::updateLocalAxis() {
     mUp.sub(mPrevPoint->mPosition);
     MR::normalize(&mUp);
 
-    TVec3f front;
-    PSVECCrossProduct(&mSide, &mUp, &front);
-    if (MR::isNearZero(front, 0.001f)) {
+    TVec3f front = mSide.cross(mUp);
+    if (MR::isNearZero(front)) {
         MR::makeAxisUpFront(&mSide, &mFront, mUp, mFront);
     } else {
         MR::makeAxisUpSide(&mFront, &mSide, mUp, mSide);
@@ -168,7 +166,7 @@ void Creeper::init(const JMapInfoIter& rIter) {
 inline void Creeper::exeFree() {
 }
 
-inline void Creeper::exeFreeInvalid() {
+void Creeper::exeFreeInvalid() {
     if (MR::isNearPlayer(this, 200.0f) && MR::isGreaterStep(this, 20)) {
         setNerve(&NrvCreeper::CreeperNrvFree::sInstance);
     }
@@ -261,8 +259,8 @@ void Creeper::control() {
         mCoord = MR::getRailCoord(this) / MR::getRailTotalLength(this);
     }
 
-    mTopMtx.setVec(getHeadPoint()->mSide, getHeadPoint()->mUp, getHeadPoint()->mFront);
-    mTopMtx.setPos(getHeadPoint()->mPosition);
+    mTopMtx.setXYZDir(getHeadPoint()->mSide, getHeadPoint()->mUp, getHeadPoint()->mFront);
+    mTopMtx.setTrans(getHeadPoint()->mPosition);
 }
 
 bool Creeper::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver) {
@@ -376,7 +374,7 @@ bool Creeper::tryJump() {
 
     calcAndGetCurrentInfo(&mPosition, &mUp);
 
-    TVec3f launchFront = mBendDirection.negateInline();
+    TVec3f launchFront = -mBendDirection;
 
     MR::vecKillElement(launchFront, mGravity, &launchFront);
     MR::normalizeOrZero(&launchFront);
@@ -385,7 +383,7 @@ bool Creeper::tryJump() {
     }
 
     TVec3f launch;
-    launch = launchFront.scaleInline(mLaunchHorizontalSpeed) - mGravity.scaleInline(mLaunchVerticalSpeed);
+    launch = launchFront * mLaunchHorizontalSpeed - mGravity * mLaunchVerticalSpeed;
 
     MR::startBckPlayer("GrowPlantJump", static_cast< const char* >(nullptr));
     MR::endMultiActorCamera(this, mCameraInfo, "掴まり", true, -1);
@@ -442,7 +440,7 @@ void Creeper::calcAndGetCurrentInfo(TVec3f* pPosition, TVec3f* pUp) const {
 
     if (idx < mNumPoints - 1) {
         s32 nextIdx = idx + 1;
-        *pPosition = mPoints[idx]->mPosition.scaleInline(1.0f - t) + mPoints[nextIdx]->mPosition.scaleInline(t);
+        *pPosition = mPoints[idx]->mPosition * (1.0f - t) + mPoints[nextIdx]->mPosition * t;
         *pUp = mPoints[nextIdx]->mPosition - mPoints[idx]->mPosition;
     } else {
         s32 prevIdx = idx - 1;

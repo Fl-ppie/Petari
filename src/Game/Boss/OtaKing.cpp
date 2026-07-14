@@ -164,9 +164,9 @@ void OtaKing::startAppearDemo() {
 }
 
 void OtaKing::makeArchiveList(NameObjArchiveListCollector* pArchiveList, const JMapInfoIter& rIter) {
-    bool isLv2 = false;
-    MR::getJMapInfoArg1NoInit(rIter, &isLv2);
-    bool isLv2Flag = isLv2;
+    bool arg1 = false;
+    MR::getJMapInfoArg1NoInit(rIter, &arg1);
+    bool isLv2 = arg1;
 
     pArchiveList->addArchive(CocoNut::getModelName());
     pArchiveList->addArchive("FireBall");
@@ -174,7 +174,7 @@ void OtaKing::makeArchiveList(NameObjArchiveListCollector* pArchiveList, const J
     pArchiveList->addArchive("OtaKingMagma");
     pArchiveList->addArchive("OtaKingMagmaBloom");
 
-    if (!isLv2Flag) {
+    if (!isLv2) {
         pArchiveList->addArchive("OtaKing");
         pArchiveList->addArchive("OtaKingFoot");
         pArchiveList->addArchive("OtaKingLongFoot");
@@ -294,7 +294,6 @@ void OtaKing::initMapToolInfo(const JMapInfoIter& rIter) {
     MR::useStageSwitchWriteDead(this, rIter);
 
     bool arg1 = false;
-
     MR::getJMapInfoArg1NoInit(rIter, &arg1);
     mIsLv2 = arg1;
 }
@@ -366,9 +365,7 @@ void OtaKing::dirToPlayer() {
     TVec3f vec;
     vec.sub(*MR::getPlayerPos(), mPosition);
 
-    f32 angle = JMAATan2(vec.x, vec.z);
-
-    angle = MR::repeat(MR::toDegree(angle), mRotation.y - 180.0f, 360.0f);
+    f32 angle = MR::repeat(MR::toDegree(MR::atan2(vec.x, vec.z)), mRotation.y - 180.0f, 360.0f);
 
     f32 angleMinRotY = angle - mRotation.y;
 
@@ -538,9 +535,7 @@ void OtaKing::throwCocoNut() {
     TVec3f vec;
     vec.sub(*MR::getPlayerPos(), mPosition);
 
-    f32 angle = JMAATan2(vec.x, vec.z);
-
-    angle = mRotation.y - MR::repeat(MR::toDegree(angle), mRotation.y - 180.0f, 360.0f);
+    f32 angle = mRotation.y - MR::repeat(MR::toDegree(MR::atan2(vec.x, vec.z)), mRotation.y - 180.0f, 360.0f);
     f32 random = MR::getRandom(::cThrowAngleMin, ::cThrowAngleMax);
 
     cocoNut->appearAndThrow(trans, angle + (_EC % 2 == mHits % 2 ? random : -random));
@@ -556,8 +551,7 @@ void OtaKing::throwFireBall() {
     TVec3f vec;
     vec.sub(*MR::getPlayerPos(), mPosition);
 
-    f32 angle = JMAATan2(vec.x, vec.z);
-    angle = mRotation.y - MR::repeat(MR::toDegree(angle), mRotation.y - 180.0f, 360.0f);
+    f32 angle = mRotation.y - MR::repeat(MR::toDegree(MR::atan2(vec.x, vec.z)), mRotation.y - 180.0f, 360.0f);
 
     for (int i = 0; i < ::cFireBallThrowNum; i++) {
         FireBall* currentFireBall = getDisappearedFireBall();
@@ -614,7 +608,7 @@ void OtaKing::appearBubble() {
             vec1.sub(trans, mPosition);
 
             if (MR::normalizeOrZero(&vec1)) {
-                vec1.set(0.0f, 0.0f, 1.0f);
+                vec1.set< f32 >(0.0f, 0.0f, 1.0f);
             }
 
             TPos3f rotate;
@@ -622,7 +616,7 @@ void OtaKing::appearBubble() {
             rotate.makeRotate(TVec3f(0.0f, 1.0f, 0.0f),
                               MR::toRadian(((i + 0.5f) * 60.0f) + MR::getRandom(-::cBubbleAppearRandomAngle, ::cBubbleAppearRandomAngle)));
 
-            rotate.mult33Inline(vec1, vec1);
+            rotate.mult33(vec1, vec1);
             currentBubble->appear(trans, vec1, ::cBubbleAppearVelocity);
         }
     }
@@ -797,8 +791,7 @@ void OtaKing::exeAppearDemo() {
         TVec3f vec;
         vec.sub(*MR::getPlayerPos(), mPosition);
 
-        f32 angle = JMAATan2(vec.x, vec.z);
-        mRotation.y = MR::repeatDegree(MR::toDegree(angle));
+        mRotation.y = MR::repeatDegree(MR::toDegree(MR::atan2(vec.x, vec.z)));
 
         setNerve(&NrvOtaKing::OtaKingNrvThrowFireBallWait::sInstance);
     }
@@ -1059,7 +1052,7 @@ void OtaKing::exeDown() {
 void OtaKing::exeDownDemo() {
     TPos3f rotate;
     rotate.makeRotate(TVec3f(0.0f, 1.0f, 0.0f), MR::toRadian(::cDownDemoRotate.y));
-    rotate.setTransInline(mPosition);
+    rotate.setTrans(mPosition);
 
     if (MR::isFirstStep(this)) {
         startDemo();

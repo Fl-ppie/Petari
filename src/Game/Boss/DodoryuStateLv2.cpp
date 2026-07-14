@@ -306,9 +306,7 @@ void DodoryuStateLv2::endEscape() {
 
 void DodoryuStateLv2::exeEscapeJump() {
     if (MR::isFirstStep(this)) {
-        TVec3f gravity(mHost->mGravity);
-        gravity.scale(-10.0f);
-        mHost->mVelocity.set(gravity);
+        mHost->mVelocity.set(mHost->mGravity * 10.0f);
         mHost->shiftMoveStateNull();
     }
 
@@ -322,9 +320,7 @@ void DodoryuStateLv2::exeEscapeJump() {
         setNerve(&::DodoryuStateLv2NrvEscape::sInstance);
         mHost->snapToGround();
     } else {
-        TVec3f gravity(mHost->mGravity);
-        gravity.scale(0.5f);
-        mHost->mVelocity.add(gravity);
+        mHost->mVelocity += mHost->mGravity * 0.5f;
     }
 }
 
@@ -448,9 +444,7 @@ void DodoryuStateLv2::exeFindPos() {
             TPos3f mtx = mHost->mBaseMtx;
             TVec3f trans;
             mtx.getTrans(trans);
-            TVec3f scaledOffset(offset);
-            scaledOffset.scale(0.2f);
-            trans.add(scaledOffset);
+            trans += offset * 0.2f;
             mtx.setTrans(trans);
             mHost->setMtx(mtx);
         }
@@ -500,10 +494,7 @@ void DodoryuStateLv2::exeChaseMoreStart() {
         } else {
             MR::normalize(&toPlayer);
         }
-
-        TVec3f vel(toPlayer);
-        vel.scale(1500.0f / MR::getBckCtrl(mHost)->getEnd());
-        mHost->mVelocity.set(vel);
+        mHost->mVelocity.set(toPlayer * (1500.0f / MR::getBckCtrl(mHost)->getEnd()));
     }
 
     MR::startLevelSound(mHost, "SE_BM_LV_DODORYU_SHOUT");
@@ -694,11 +685,10 @@ bool DodoryuStateLv2::catchPlayerAttack(u32 msg, HitSensor* pSender, HitSensor* 
 
         if (!calcVerticalizedDir(&_A0, _A0)) {
             mHost->mBaseMtx.getZDir(_A0);
-            _A0.negateInternal();
+            _A0.negate();
         }
 
-        _A0.negateInternal();
-        turnToward(_A0, 1.0f);
+        turnToward(-_A0, 1.0f);
         MR::tryRumblePadMiddle(this, 0);
         MR::stopScene(::sStopSceneFrame);
         setNerve(&::DodoryuStateLv2NrvKnockDown::sInstance);
@@ -725,9 +715,7 @@ void DodoryuStateLv2::knockOver() {
     TPos3f mtx(mHost->mBaseMtx);
     TVec3f trans;
     mtx.getTrans(trans);
-    TVec3f knockDir(_A0);
-    knockDir.scale(::sKnockSpeed);
-    trans.add(knockDir);
+    trans += (_A0 * ::sKnockSpeed);
     mtx.setTrans(trans);
     mHost->setMtx(mtx);
     mHost->keepOffFromClosedArea(nullptr);
@@ -844,9 +832,7 @@ void DodoryuStateLv2::calcRandomVelocity(s32 time) {
     f32 dist = MR::getRandom(mChaseParam->_84, mChaseParam->_88);
     f32 speed = dist / time;
     mHost->setMtx(MR::getPlayerBaseMtx());
-    TVec3f vel(frontVec);
-    vel.scale(speed);
-    mHost->mVelocity.set(vel);
+    mHost->mVelocity.set(frontVec * speed);
 }
 
 void DodoryuStateLv2::keepVerticalizedVelocity() {
@@ -945,13 +931,8 @@ void DodoryuStateLv2::addVelocity(bool snapToGround) {
 }
 
 void DodoryuStateLv2::calcLimitedRotateMtx(TPos3f* pMtx, const TVec3f& rFrom, const TVec3f& rTo, f32 rate) {
-    f32 maxAngle = rate * PI / 180.0f;
-    TVec3f cross;
-    PSVECCrossProduct(&rFrom, &rTo, &cross);
-    f32 crossMag = cross.length();
-    f32 dotResult = rFrom.dot(rTo);
-    f32 angle = JMath::sAtanTable.atan2_(crossMag, dotResult);
-    f32 absAngle = __fabsf(angle);
+    f32 maxAngle = rate * MR::pi() / 180.0f;
+    f32 absAngle = rFrom.angle(rTo);
     f32 ratio = 1.0f;
 
     if (absAngle > maxAngle) {
@@ -1024,4 +1005,14 @@ void DodoryuStateLv2::startLeadHillBck(const DodoryuAnimSet& rAnim) {
     } else {
         mHost->startLeadHillBck(rAnim.mLeadHillBckName);
     }
+}
+
+void DUMMY() {
+    // NOTE: to emit TPos3f::makeRotate, TVec3f::setLength, TRot3f::mult33
+    TVec3f a;
+    a.setLength(2.0f);
+    TPos3f m;
+    m.makeRotate(a, 3.0f);
+    TVec3f b;
+    m.mult33(b);
 }

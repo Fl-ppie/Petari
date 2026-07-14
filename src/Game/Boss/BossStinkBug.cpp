@@ -148,7 +148,7 @@ void BossStinkBug::initCollision() {
     _8C = new CollisionParts*[3];
     for (int i = 0; i < 3; i++) {
         _8C[i] = MR::createCollisionPartsFromLiveActor(this, ::sCollisionInfo[i]._0, getSensor(::sCollisionInfo[i]._8),
-                                                       MR::getJointMtx(this, sCollisionInfo[i]._4), MR::AutoEqualScale);
+                                                       MR::getJointMtx(this, sCollisionInfo[i]._4), MR::CollisionScaleType_AutoEqualScale);
     }
 }
 
@@ -185,7 +185,7 @@ void BossStinkBug::calcAndSetBaseMtx() {
     _98->setCallBackFunction();
     TPos3f pos;
     pos.setQuat(_DC);
-    pos.setPos(mPosition);
+    pos.setTrans(mPosition);
 
     _9C.setInline(pos);
 
@@ -401,7 +401,7 @@ bool BossStinkBug::throwBomb(f32 f1, f32 f2) {
 
     jointMtx.getTrans(trans);
     jointMtx.getYDir(yDir);
-    yDir.scale(-f1);
+    yDir *= -f1;
     MR::addRandomVector(&yDir, yDir, f2);
 
     throwBomb->start(trans, yDir);
