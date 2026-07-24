@@ -264,6 +264,7 @@ cflags_jsys_j3d = [*cflags_jsys, "-O4,p"]
 
 cflags_jsys_jaudio = [*cflags_jsys, "-ipa file"]
 cflags_jsys_jasdsp = [*cflags_jsys_jaudio, "-func_align 32"]
+cflags_jsys_jpa = [*cflags_jsys, "-ipa file"]
 
 cflags_trk = [
     "-nodefaults",
@@ -561,6 +562,14 @@ def JSys_JAudioLib(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
         "objects": objects,
     }
 
+def JSys_JParticleLib(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
+    return {
+        "lib": lib_name,
+        "mw_version": "GC/3.0a3",
+        "cflags": cflags_jsys_jpa,
+        "progress_category": "jsys",
+        "objects": objects,
+    }
 
 Matching = True  # Object matches and should be linked
 NonMatching = False  # Object does not match and should not be linked
@@ -1004,10 +1013,10 @@ config.libs = [
             Object(Matching, "Game/Camera/CamTranslatorWonderPlanet.cpp"),
             Object(Matching, "Game/Camera/Camera.cpp"),
             Object(NonMatching, "Game/Camera/CameraAnim.cpp"),
-            Object(NonMatching, "Game/Camera/CameraBehind.cpp"),
-            Object(NonMatching, "Game/Camera/CameraBlackHole.cpp"),
+            Object(Matching, "Game/Camera/CameraBehind.cpp"),
+            Object(Matching, "Game/Camera/CameraBlackHole.cpp"),
             Object(NonMatching, "Game/Camera/CameraCalc.cpp"),
-            Object(NonMatching, "Game/Camera/CameraCharmedFix.cpp"),
+            Object(Matching, "Game/Camera/CameraCharmedFix.cpp"),
             Object(NonMatching, "Game/Camera/CameraCharmedTripodBoss.cpp"),
             Object(NonMatching, "Game/Camera/CameraCharmedVecReg.cpp"),
             Object(NonMatching, "Game/Camera/CameraCharmedVecRegTower.cpp"),
@@ -1067,7 +1076,7 @@ config.libs = [
             Object(NonMatching, "Game/Camera/CameraTalk.cpp"),
             Object(NonMatching, "Game/Camera/CameraTargetArg.cpp"),
             Object(Matching, "Game/Camera/CameraTargetHolder.cpp"),
-            Object(NonMatching, "Game/Camera/CameraTargetMtx.cpp"),
+            Object(Matching, "Game/Camera/CameraTargetMtx.cpp"),
             Object(NonMatching, "Game/Camera/CameraTargetObj.cpp"),
             Object(NonMatching, "Game/Camera/CameraTestObj.cpp"),
             Object(NonMatching, "Game/Camera/CameraTower.cpp"),
@@ -1258,7 +1267,7 @@ config.libs = [
             ),
             Object(NonMatching, "Game/Enemy/Teresa.cpp"),
             Object(NonMatching, "Game/Enemy/TeresaWater.cpp"),
-            Object(NonMatching, "Game/Enemy/TerritoryMover.cpp"),
+            Object(Matching, "Game/Enemy/TerritoryMover.cpp"),
             Object(NonMatching, "Game/Enemy/Unizo.cpp"),
             Object(NonMatching, "Game/Enemy/UnizoLauncher.cpp"),
             Object(
@@ -1350,7 +1359,7 @@ config.libs = [
             Object(NonMatching, "Game/LiveActor/HitSensorInfo.cpp"),
             Object(Matching, "Game/LiveActor/HitSensorKeeper.cpp"),
             Object(NonMatching, "Game/LiveActor/IKJointCtrl.cpp"),
-            Object(NonMatching, "Game/LiveActor/LiveActor.cpp"),
+            Object(Matching, "Game/LiveActor/LiveActor.cpp"),
             Object(Matching, "Game/LiveActor/LiveActorFlag.cpp"),
             Object(Matching, "Game/LiveActor/LiveActorGroup.cpp"),
             Object(NonMatching, "Game/LiveActor/LiveActorGroupArray.cpp"),
@@ -1416,9 +1425,9 @@ config.libs = [
             Object(NonMatching, "Game/Map/HitInfo.cpp"),
             Object(NonMatching, "Game/Map/KCollision.cpp"),
             Object(NonMatching, "Game/Map/KCollisionPlus.cpp"),
-            Object(NonMatching, "Game/Map/KoopaBattleMapCoinPlate.cpp"),
-            Object(NonMatching, "Game/Map/KoopaBattleMapDamagePlate.cpp"),
-            Object(NonMatching, "Game/Map/KoopaBattleMapPlanet.cpp"),
+            Object(Matching, "Game/Map/KoopaBattleMapCoinPlate.cpp"),
+            Object(Matching, "Game/Map/KoopaBattleMapDamagePlate.cpp"),
+            Object(Matching, "Game/Map/KoopaBattleMapPlanet.cpp"),
             Object(Matching, "Game/Map/KoopaBattleMapPlate.cpp"),
             Object(NonMatching, "Game/Map/KoopaBattleMapStair.cpp"),
             Object(Matching, "Game/Map/LavaShellTower.cpp"),
@@ -1496,7 +1505,7 @@ config.libs = [
                 cflags=[*cflags_game, "-sym off"],
             ),
             Object(NonMatching, "Game/MapObj/AssemblyBlock.cpp"),
-            Object(NonMatching, "Game/MapObj/AstroCore.cpp"),
+            Object(Matching, "Game/MapObj/AstroCore.cpp"),
             Object(NonMatching, "Game/MapObj/AstroCountDownPlate.cpp"),
             Object(Matching, "Game/MapObj/AstroDome.cpp"),
             Object(Matching, "Game/MapObj/AstroDomeAsteroid.cpp"),
@@ -1504,7 +1513,7 @@ config.libs = [
             Object(NonMatching, "Game/MapObj/AstroDomeCameraController.cpp"),
             Object(NonMatching, "Game/MapObj/AstroDomeComet.cpp"),
             Object(NonMatching, "Game/MapObj/AstroDomeDemoAstroGalaxy.cpp"),
-            Object(NonMatching, "Game/MapObj/AstroDomeGalaxySelector.cpp"),
+            Object(Matching, "Game/MapObj/AstroDomeGalaxySelector.cpp"),
             Object(NonMatching, "Game/MapObj/AstroDomeOrbit.cpp"),
             Object(NonMatching, "Game/MapObj/AstroDomeSky.cpp"),
             Object(Matching, "Game/MapObj/AstroMapBoard.cpp"),
@@ -1708,14 +1717,14 @@ config.libs = [
             Object(NonMatching, "Game/MapObj/SeaBottomTriplePropeller.cpp"),
             Object(NonMatching, "Game/MapObj/SeesawMoveNut.cpp"),
             Object(NonMatching, "Game/MapObj/Shellfish.cpp"),
-            Object(NonMatching, "Game/MapObj/ShockWaveGenerator.cpp"),
+            Object(Matching, "Game/MapObj/ShockWaveGenerator.cpp"),
             Object(NonMatching, "Game/MapObj/ShootingStar.cpp"),
             Object(NonMatching, "Game/MapObj/SideSpikeMoveStep.cpp"),
             Object(NonMatching, "Game/MapObj/SimpleBreakableObj.cpp"),
             Object(NonMatching, "Game/MapObj/SimpleClipPartsObj.cpp"),
             Object(NonMatching, "Game/MapObj/SimpleFloaterObj.cpp"),
             Object(NonMatching, "Game/MapObj/SimpleMapObj.cpp"),
-            Object(NonMatching, "Game/MapObj/SimpleNormalMapObj.cpp"),
+            Object(Matching, "Game/MapObj/SimpleNormalMapObj.cpp"),
             Object(Matching, "Game/MapObj/SimpleTimerObj.cpp"),
             Object(NonMatching, "Game/MapObj/SmallStone.cpp"),
             Object(NonMatching, "Game/MapObj/SnowCapsulePlanet.cpp"),
@@ -1775,7 +1784,7 @@ config.libs = [
             Object(NonMatching, "Game/MapObj/WarpPod.cpp"),
             Object(NonMatching, "Game/MapObj/WatchTowerRotateStep.cpp"),
             Object(NonMatching, "Game/MapObj/WaterfallCaveCover.cpp"),
-            Object(NonMatching, "Game/MapObj/WaterLeakPipe.cpp"),
+            Object(Matching, "Game/MapObj/WaterLeakPipe.cpp"),
             Object(NonMatching, "Game/MapObj/WaterPressure.cpp"),
             Object(NonMatching, "Game/MapObj/WaterPressureBullet.cpp"),
             Object(Matching, "Game/MapObj/WaterPressureBulletHolder.cpp"),
@@ -2389,7 +2398,7 @@ config.libs = [
         [
             Object(NonMatching, "Game/Util/ActorCameraUtil.cpp"),
             Object(NonMatching, "Game/Util/ActorMovementUtil.cpp"),
-            Object(NonMatching, "Game/Util/ActorSensorUtil.cpp"),
+            Object(Matching, "Game/Util/ActorSensorUtil.cpp"),
             Object(NonMatching, "Game/Util/ActorShadowLocalUtil.cpp"),
             Object(NonMatching, "Game/Util/ActorShadowUtil.cpp"),
             Object(Matching, "Game/Util/ActorStateUtil.cpp"),
@@ -3250,7 +3259,7 @@ config.libs = [
             Object(NonMatching, "JSystem/JMath/JMATrigonometric.cpp"),
         ],
     ),
-    JSysLib(
+    JSys_JParticleLib(
         "JParticle",
         [
             Object(NonMatching, "JSystem/JParticle/JPAResourceManager.cpp"),
