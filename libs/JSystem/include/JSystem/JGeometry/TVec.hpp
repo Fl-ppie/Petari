@@ -11,8 +11,8 @@
 #include <JSystem/JMath/JMath.hpp>
 
 namespace JGeometry {
-    inline void negateInternal(register const f32* rSrc, register f32* rDest) {
 #ifdef __MWERKS__
+    inline void negateInternal(register const f32* rSrc, register f32* rDest) {
         register f32 xy;
         __asm {
             psq_l xy, 0(rSrc), 0, 0
@@ -20,8 +20,10 @@ namespace JGeometry {
             psq_st xy, 0(rDest), 0, 0
         }
         rDest[2] = -rSrc[2];
-#endif
     }
+#else
+    inline void negateInternal(const f32* rSrc, f32* rDest);
+#endif
 
 #ifdef __MWERKS__
     inline static void subInternal(register const f32* vec1, register const f32* vec2, register f32* dst) {
@@ -64,7 +66,7 @@ namespace JGeometry {
         }
 
         template < typename A >
-        inline TVec2(A _x, A _y) {
+        TVec2(A _x, A _y) {
             x = _x;
             y = _y;
         }
@@ -89,7 +91,10 @@ namespace JGeometry {
 
         /* General operations */
         template < typename A >
-        void set(const JGeometry::TVec2< A >& rSrc);
+        void set(const JGeometry::TVec2< A >& rSrc) NO_INLINE {
+            x = rSrc.x;
+            y = rSrc.y;
+        }
 
         void set(T v) {
             y = x = v;
@@ -120,7 +125,7 @@ namespace JGeometry {
         }
 
         inline bool isZero() const {
-            return dot(*this) <= (f32)JGeometry::TUtil< f32 >::epsilon();
+            return dot(*this) <= JGeometry::TUtil< f32 >::epsilon();
         }
 
         void sub(const TVec2< T >& rOther) {
@@ -204,7 +209,7 @@ namespace JGeometry {
 
         f32 setLength(f32 newlength) {
             f32 oldlength = squared();
-            if (oldlength <= 0.0000038146973f) {
+            if (oldlength <= JGeometry::TUtil< f32 >::epsilon()) {
                 return 0.0f;
             }
             f32 lengthinv = JGeometry::TUtil< f32 >::inv_sqrt(oldlength);
@@ -320,7 +325,6 @@ namespace JGeometry {
         TVec3(const TVec3< f32 >& vec);
 #endif
 
-        // Can't be NO_INLINE (gets inlined in DiskGravity::DiskGravity())
         template < typename T >
         TVec3(T _x, T _y, T _z) {
             x = _x;
@@ -334,8 +338,8 @@ namespace JGeometry {
             z = xz;
         }
 
-        TVec3(f32 val) NO_INLINE {
-            z = y = x = val;
+        TVec3(f32 val) {
+            set(val, val, val);
         }
 
         template < typename T >
@@ -375,10 +379,6 @@ namespace JGeometry {
             }
             ;
 #endif
-        }
-
-        inline void setPS(const TVec3< f32 >& rSrc) {
-            *this = rSrc;
         }
 
         template < typename T >
@@ -561,8 +561,13 @@ namespace JGeometry {
         }
 
         bool operator==(const TVec3& rVec) const {
-            return TUtil< f32 >::epsilonEquals(x, rVec.x, 0.0000038146973f) && TUtil< f32 >::epsilonEquals(y, rVec.y, 0.0000038146973f) &&
-                   TUtil< f32 >::epsilonEquals(z, rVec.z, 0.0000038146973f);
+            return TUtil< f32 >::epsilonEquals(x, rVec.x, JGeometry::TUtil< f32 >::epsilon()) &&
+                   TUtil< f32 >::epsilonEquals(y, rVec.y, JGeometry::TUtil< f32 >::epsilon()) &&
+                   TUtil< f32 >::epsilonEquals(z, rVec.z, JGeometry::TUtil< f32 >::epsilon());
+        }
+
+        bool operator!=(const TVec3& rVec) const {
+            return !(*this == rVec);
         }
 
         TVec3 operator-() const {
@@ -579,10 +584,8 @@ namespace JGeometry {
             JGeometry::negateInternal(&rVec.x, &this->x);
         }
 
-        static inline TVec3 makeZeroVec() {
-            TVec3 v;
-            v.set(0.0f, 0.0f, 0.0f);
-            return v;
+        void zero() {
+            x = y = z = 0;
         }
 
 #ifdef __MWERKS__
@@ -676,6 +679,12 @@ namespace JGeometry {
             JMAVECScaleAdd(rKillDir, this, this, -rKillDir.dot(*this));
         }
 
+        TVec3 getOrthogonal(const TVec3& rVec) const {
+            TVec3 ret;
+            ret.killElement(rVec, *this);
+            return ret;
+        }
+
         f32 normalize() {
             f32 magnitude = length();
             PSVECNormalize(this, this);
@@ -733,19 +742,13 @@ namespace JGeometry {
         f32 squared(const TVec3& rB) const;
 #endif
 
-        void zero();
-
-        inline void zeroInline() {
-            x = y = z = 0;
-        }
-
         bool isZero() const {
-            return squared() <= 0.0000038146973f;
+            return squared() <= JGeometry::TUtil< f32 >::epsilon();
         }
 
         f32 setLength(f32 newlength) {
             f32 oldlength = squared();
-            if (oldlength <= 0.0000038146973f) {
+            if (oldlength <= JGeometry::TUtil< f32 >::epsilon()) {
                 return 0.0f;
             }
             f32 lengthinv = JGeometry::TUtil< f32 >::inv_sqrt(oldlength);
@@ -755,7 +758,7 @@ namespace JGeometry {
 
         f32 setLength(const TVec3& rVec, f32 newlength) {
             f32 oldlength = rVec.squared();
-            if (oldlength <= 0.0000038146973f) {
+            if (oldlength <= JGeometry::TUtil< f32 >::epsilon()) {
                 zero();
                 return 0.0f;
             }
@@ -784,6 +787,12 @@ namespace JGeometry {
         inline TVec3 copy() const {
             TVec3 ret(*this);
             return ret;
+        }
+
+        // required for CameraCharmedVecRegTower.
+        // TODO: better name
+        inline bool orientation(const TVec3& rA, const TVec3& rB) const {
+            return rA.cross(rB).dot(*this) < 0.0f;
         }
     };
 
@@ -855,7 +864,7 @@ namespace JGeometry {
             this->w = _w;
         }
 
-        TQuat4(const TQuat4& rOther) {
+        TQuat4(const Quaternion& rOther) {
             this->x = rOther.x;
             this->y = rOther.y;
             this->z = rOther.z;
@@ -869,7 +878,7 @@ namespace JGeometry {
         /* General operations */
         void normalize() {
             f32 length = squared();
-            if (length <= (f32)JGeometry::TUtil< f32 >::epsilon()) {
+            if (length <= JGeometry::TUtil< f32 >::epsilon()) {
                 TVec4< T >::template set< T >(0.0f, 0.0f, 0.0f, 1.0f);
                 return;
             }
@@ -899,12 +908,31 @@ namespace JGeometry {
         void setEulerDegree(T _x, T _y, T _z) {
             setEuler(_x * PI_180, _y * PI_180, _z * PI_180);
         }
-        void setEulerZ(T _z);
+        void setEulerZ(T _z) {
+            f32 s = sin(_z * 0.5f);
+            f32 c = cos(_z * 0.5f);
+            this->x = 0.0f;
+            this->y = 0.0f;
+            this->z = s;
+            this->w = c;
+        };
+
+        f32 getRotate(TVec3< T >& rAxis) {
+            f32 length = toTvec()->squared();
+            if (length <= JGeometry::TUtil< f32 >::epsilon()) {
+                rAxis.zero();
+                return 0.0f;
+            }
+
+            f32 lengthinv = JGeometry::TUtil< f32 >::inv_sqrt(length);
+            rAxis.scale(lengthinv, *toTvec());
+            return JGeometry::TUtil< f32 >::acos(this->w) * 2.0f;
+        }
 
         void setRotate(const TVec3< f32 >& rA, const TVec3< f32 >& rB, f32 ratio) {
             TVec3< f32 > dir = rA.cross(rB);
             f32 crossPart = dir.length();
-            if (crossPart <= 0.0000038146973f) {
+            if (crossPart <= JGeometry::TUtil< f32 >::epsilon()) {
                 set< f32 >(0.0f, 0.0f, 0.0f, 1.0f);
             } else {
                 f32 dotPart = rA.dot(rB);
@@ -972,6 +1000,10 @@ namespace JGeometry {
             PSQUATMultiply(&q, this, this);
         }
 
+        void mult(const TQuat4& q1, const TQuat4& q2) {
+            PSQUATMultiply(q1, q2, this);
+        }
+
         f32 dot(const TQuat4& q) const {
             return PSQUATDotProduct(this, &q);
         }
@@ -1007,7 +1039,13 @@ namespace JGeometry {
         }
 
         /* Operators */
-        TQuat4< T >& operator=(const TQuat4< T >& rSrc);
+        TQuat4< T >& operator=(const TQuat4< T >& rSrc) {
+            this->x = rSrc.x;
+            this->y = rSrc.y;
+            this->z = rSrc.z;
+            this->w = rSrc.w;
+            return *this;
+        }
     };
 
 };  // namespace JGeometry

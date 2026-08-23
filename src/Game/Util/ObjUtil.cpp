@@ -850,8 +850,8 @@ namespace MR {
         getCameraDirector()->mShaker->shakeVertical(CameraShaker::SINGLY_VERTICAL_POWER_VERY_WEAK);
     }
 
-    void shakeCameraInfinity(NameObj* pObj, f32 param2, f32 param3) {
-        getCameraDirector()->mShaker->shakeInfinity(pObj, param2, 15.0f / param3);
+    void shakeCameraInfinity(NameObj* pObj, f32 intensity, f32 speed) {
+        getCameraDirector()->mShaker->shakeInfinity(pObj, intensity, 15.0f / speed);
     }
 
     void stopShakingCamera(NameObj* pObj) {
@@ -870,11 +870,11 @@ namespace MR {
         return MR::getNamePosHolder()->tryRegisterLinkObj(pObj, rIter);
     }
 
-    void findNamePos(const char* pName, MtxPtr pMtx) {
+    bool findNamePos(const char* pName, MtxPtr pMtx) {
         MR::tryFindLinkNamePos(nullptr, pName, pMtx);
     }
 
-    void findNamePos(const char* pName, TVec3f* a2, TVec3f* a3) {
+    bool findNamePos(const char* pName, TVec3f* a2, TVec3f* a3) {
         getNamePosHolder()->find(nullptr, pName, a2, a3);
     }
 

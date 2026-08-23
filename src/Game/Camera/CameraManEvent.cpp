@@ -7,31 +7,28 @@
 #include "Game/Camera/CameraLocalUtil.hpp"
 #include "Game/Camera/CameraParamChunk.hpp"
 #include "Game/Camera/CameraParamChunkHolder.hpp"
+#include "Game/Camera/CameraParamChunkID.hpp"
 #include "Game/Util/CameraUtil.hpp"
+#include "Game/Util/MathUtil.hpp"
 
-// Constructor for mTargetArg is called. The constructor exists in the symbol so
-// it's not fully inlined. It also exists in the code (not inlined), but the code below
-// matches the constructor exactly.
-CameraManEvent::ChunkFIFOItem::ChunkFIFOItem() {
-    mTargetArg.mTargetObj = nullptr;
-    mTargetArg.mTargetMtx = nullptr;
-    mTargetArg.mLiveActor = nullptr;
-    mTargetArg.mMarioActor = nullptr;
+void CameraManEvent_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
 }
 
-CameraManEvent::CameraManEvent(CameraHolder* pHolder, CameraParamChunkHolder* pChunkHolder, const char* pName)
-    : CameraMan(pName), mHolder(pHolder), mChunkHolder(pChunkHolder), mCamera(nullptr) {
-    mChunk = nullptr;
-    _B8 = 0;
-    _BC = false;
+namespace {
+    static const f32 sMinDistance = 300.0f;
+    static const s32 sDefaultBlendFrame = 60;
+};  // namespace
 
+CameraManEvent::CameraManEvent(CameraHolder* pHolder, CameraParamChunkHolder* pChunkHolder, const char* pName)
+    : CameraMan(pName), mHolder(pHolder), mChunkHolder(pChunkHolder), mCamera(nullptr), mChunk(), _B8(), mRequestReset() {
     for (u32 i = 0; i < NR_FIFO_ITEMS; i++) {
         mItems[i].mFirst.mChunk = nullptr;
         mItems[i].mSecond.mChunk = nullptr;
     }
 }
 
-CameraManEvent::~CameraManEvent() {
+CameraManEvent::ChunkFIFOItem::ChunkFIFOItem() {
 }
 
 void CameraManEvent::init(const JMapInfoIter& rIter) {
@@ -47,62 +44,18 @@ void CameraManEvent::calc() {
     setSafePose();
 }
 
-void CameraManEvent::notifyActivate() {
-    _BC = true;
-}
-
-void CameraManEvent::notifyDeactivate() {
-    mCamera = nullptr;
-}
-
-bool CameraManEvent::isInterpolationOff() const {
-    if (mCamera != nullptr && mCamera->isInterpolationOff()) {
-        return true;
-    }
-
-    if (mChunk != nullptr && mChunk->isAntiBlurOff()) {
-        return true;
-    }
-
-    return false;
-}
-
-bool CameraManEvent::isCollisionOff() const {
-    if (mCamera != nullptr && mCamera->isCollisionOff()) {
-        return true;
-    }
-
-    if (mChunk != nullptr && mChunk->isCollisionOff()) {
-        return true;
-    }
-
-    return false;
-}
-
-bool CameraManEvent::isZeroFrameMoveOff() const {
-    if (mCamera != nullptr) {
-        return mCamera->isZeroFrameMoveOff();
-    }
-
-    return false;
-}
-
-bool CameraManEvent::isCorrectingErpPositionOff() const {
-    return mCamera != nullptr && mCamera->isCorrectingErpPositionOff();
-}
-
-void CameraManEvent::start(s32 zoneID, const char* pName, const CameraTargetArg& rTargetArg, s32 a4) {
+void CameraManEvent::start(s32 zoneID, const char* pName, const CameraTargetArg& rTargetArg, s32 frame) {
     CameraParamChunkEvent* chunk = findChunk(zoneID, pName);
-    requestChunk(chunk, static_cast< EPriority >(chunk->mEvPriority), rTargetArg, a4);
+    requestChunk(chunk, static_cast< EPriority >(chunk->mEvPriority), rTargetArg, frame);
     rTargetArg.setTarget();
 }
 
-void CameraManEvent::end(s32 zoneID, const char* pName, s32 a3) {
+void CameraManEvent::end(s32 zoneID, const char* pName, s32 frame) {
     CameraParamChunkEvent* chunk = findChunk(zoneID, pName);
     searchPriority(chunk);
 
     if (cleanChunkFIFO(chunk)) {
-        sendFinishInterpolateFrame(chunk, a3);
+        sendFinishInterpolateFrame(chunk, frame);
     }
 
     if (isChunkFIFOEmpty()) {
@@ -137,6 +90,38 @@ bool CameraManEvent::isActive() const {
     return !isChunkFIFOEmpty();
 }
 
+bool CameraManEvent::isInterpolationOff() const {
+    if (mCamera != nullptr && mCamera->isInterpolationOff()) {
+        return true;
+    }
+
+    if (mChunk != nullptr && mChunk->isAntiBlurOff()) {
+        return true;
+    }
+
+    return false;
+}
+
+bool CameraManEvent::isCollisionOff() const {
+    if (mCamera != nullptr && mCamera->isCollisionOff()) {
+        return true;
+    }
+
+    if (mChunk != nullptr && mChunk->isCollisionOff()) {
+        return true;
+    }
+
+    return false;
+}
+
+bool CameraManEvent::isZeroFrameMoveOff() const {
+    if (mCamera != nullptr) {
+        return mCamera->isZeroFrameMoveOff();
+    }
+
+    return false;
+}
+
 bool CameraManEvent::doesNextChunkHaveInterpolation() const {
     const ChunkFIFOItem* item = nullptr;
 
@@ -151,19 +136,22 @@ bool CameraManEvent::doesNextChunkHaveInterpolation() const {
         }
     }
 
-    if (item != nullptr && getInterpolateFrame(item->mChunk, item->_14) > 0) {
+    if (item != nullptr && getInterpolateFrame(item->mChunk, item->mFrame) > 0) {
         return true;
     }
 
     return false;
 }
 
+bool CameraManEvent::isCorrectingErpPositionOff() const {
+    return mCamera != nullptr && mCamera->isCorrectingErpPositionOff();
+}
+
 u32 CameraManEvent::getAnimCameraFrame(s32 zoneID, const char* pName) const {
     mHolder->getIndexOf("CAM_TYPE_ANIM");
     CameraParamChunkEvent* chunk = findChunk(zoneID, pName);
-    CamTranslatorAnim* translator = reinterpret_cast< CamTranslatorAnim* >(mHolder->getTranslator(chunk->mCameraTypeIndex));
 
-    return translator->getAnimFrame(chunk);
+    return reinterpret_cast< CamTranslatorAnim* >(mHolder->getTranslator(chunk->mCameraTypeIndex))->getAnimFrame(chunk);
 }
 
 void CameraManEvent::pauseOnAnimCamera(s32 zoneID, const char* pName) {
@@ -171,8 +159,7 @@ void CameraManEvent::pauseOnAnimCamera(s32 zoneID, const char* pName) {
     CameraParamChunkEvent* chunk = findChunk(zoneID, pName);
 
     if (chunk == mChunk && mCamera != nullptr) {
-        CameraAnim* animCamera = reinterpret_cast< CameraAnim* >(mCamera);
-        animCamera->_7C = 1;
+        reinterpret_cast< CameraAnim* >(mCamera)->mIsPaused = true;
     }
 }
 
@@ -181,14 +168,14 @@ void CameraManEvent::pauseOffAnimCamera(s32 zoneID, const char* pName) {
     CameraParamChunkEvent* chunk = findChunk(zoneID, pName);
 
     if (chunk == mChunk && mCamera != nullptr) {
-        CameraAnim* animCamera = reinterpret_cast< CameraAnim* >(mCamera);
-        animCamera->_7C = 0;
+        reinterpret_cast< CameraAnim* >(mCamera)->mIsPaused = false;
     }
 }
 
-#ifdef NON_MATCH
-// LWZ wrong instruction order, register mismatch
 void CameraManEvent::updateChunkFIFO() {
+    // FIXME: LWZ wrong instruction order, register mismatch
+    // https://decomp.me/scratch/qHkVX
+
     for (u32 i = 0; i < NR_FIFO_ITEMS; i++) {
         CameraParamChunkEvent* chunk = mItems[i].mSecond.mChunk;
 
@@ -207,13 +194,12 @@ void CameraManEvent::updateChunkFIFO() {
             mItems[i].mFirst.mTargetArg.mLiveActor = liveActor;
             mItems[i].mFirst.mTargetArg.mMarioActor = marioActor;
 
-            mItems[i].mFirst._14 = mItems[i].mSecond._14;
+            mItems[i].mFirst.mFrame = mItems[i].mSecond.mFrame;
 
             mItems[i].mSecond.mChunk = nullptr;
         }
     }
 }
-#endif
 
 void CameraManEvent::applyChunk() {
     ChunkFIFOItem* item = nullptr;
@@ -233,14 +219,14 @@ void CameraManEvent::checkReset(ChunkFIFOItem* pItem) {
     CameraParamChunkEvent* itemChunk = pItem->mChunk;
 
     if (mChunk != itemChunk) {
-        _BC = true;
-        sendStartInterpolateFrame(pItem->mChunk, pItem->_14);
+        mRequestReset = true;
+        sendStartInterpolateFrame(pItem->mChunk, pItem->mFrame);
         pItem->mTargetArg.setTarget();
     } else {
         u8 cameraIndex = itemChunk->mCameraTypeIndex;
 
         if (cameraIndex != mHolder->getIndexOf(mCamera)) {
-            _BC = true;
+            mRequestReset = true;
         }
     }
 }
@@ -265,8 +251,7 @@ void CameraManEvent::setExtraParam() {
     if (mChunk->isOnUseFovy()) {
         CameraLocalUtil::setFovy(mCamera, mChunk->mExParam.mFovy);
     } else {
-        f32 fovy = mDirector->getDefaultFovy();
-        CameraLocalUtil::setFovy(mCamera, fovy);
+        CameraLocalUtil::setFovy(mCamera, mDirector->getDefaultFovy());
     }
 
     if (mChunk->isLOfsErpOff()) {
@@ -283,14 +268,14 @@ void CameraManEvent::setVPanParam() {
         CameraHeightArrange* vPan = mCamera->mVPan;
         vPan->resetParameter();
 
-        vPan->mUpper = mChunk->mExParam.mUpper;
-        vPan->mLower = mChunk->mExParam.mLower;
+        vPan->mFocalScaleUpper = mChunk->mExParam.mUpper;
+        vPan->mFocalScaleLower = mChunk->mExParam.mLower;
         vPan->mGndInt = mChunk->mExParam.mGndInt;
-        vPan->mUPlay = mChunk->mExParam.mUPlay;
-        vPan->mLPlay = mChunk->mExParam.mLPlay;
-        vPan->mPushDelay = mChunk->mExParam.mPushDelay;
-        vPan->mPushDelayLow = mChunk->mExParam.mPushDelayLow;
-        vPan->mUDown = mChunk->mExParam.mUDown;
+        vPan->mPosOffsetMinRiseLag = mChunk->mExParam.mUPlay;
+        vPan->mPosOffsetMinDropLag = mChunk->mExParam.mLPlay;
+        vPan->mRiseDelay = mChunk->mExParam.mPushDelay;
+        vPan->mDropDelay = mChunk->mExParam.mPushDelayLow;
+        vPan->mMaxRiseEaseTime = mChunk->mExParam.mUDown;
         vPan->mVPanUse = mChunk->mExParam.mVPanUse != 0;
 
         TVec3f axis;
@@ -298,33 +283,60 @@ void CameraManEvent::setVPanParam() {
 
         vPan->mVPanAxis.set(axis);
 
-        vPan->_60 = 1;
+        vPan->mUpdateGlobalAxis = true;
     }
 }
 
 void CameraManEvent::resetCameraIfRequested() {
-    if (_BC) {
+    if (mRequestReset) {
         mCamera->mCameraMan = this;
         mCamera->reset();
-        _BC = false;
+        mRequestReset = false;
     }
 }
 
-/*void CameraManEvent::setSafePose() {
-    TVec3f pos = TVec3f(*CameraLocalUtil::getPos(mCamera));
-    TVec3f watchPos = TVec3f(*CameraLocalUtil::getWatchPos(mCamera));
-    TVec3f up = TVec3f(*CameraLocalUtil::getUpVec(mCamera));
+void CameraManEvent::setSafePose() {
+    TVec3f pos = CameraLocalUtil::getPos(mCamera);
+    TVec3f watchPos = CameraLocalUtil::getWatchPos(mCamera);
+    TVec3f up = CameraLocalUtil::getUpVec(mCamera);
 
-    TVec3f dir = watchPos - pos;
-
-    f32 length = dir.length();
-
-    if (length < 300.0f) {
-        if (length < 1.0f) {
-
+    TVec3f watchOffset = watchPos - pos;
+    f32 dist = watchOffset.length();
+    if (dist < ::sMinDistance) {
+        if (dist < 1.0f) {
+            watchPos.set(pos + CameraLocalUtil::getWatchPos(this) - CameraLocalUtil::getPos(this));
+        } else {
+            watchOffset.normalize();
+            watchPos.set(pos + watchOffset * ::sMinDistance);
         }
     }
-}*/
+
+    TVec3f camWatchDir = watchPos - pos;
+    MR::normalize(&camWatchDir);
+    MR::normalizeOrZero(&up);
+
+    if (MR::isNearZero(up) || MR::abs(camWatchDir.dot(up)) > 0.98f) {
+        TVec3f watchDir = CameraLocalUtil::getWatchPos(this) - CameraLocalUtil::getPos(this);
+        MR::normalize(&watchDir);
+        if (MR::abs(camWatchDir.dot(watchDir)) > 0.98f) {
+            up.set(CameraLocalUtil::getUpVec(this));
+        } else {
+            TQuat4f rot;
+            rot.setRotate(watchDir, camWatchDir);
+            rot.transform(CameraLocalUtil::getUpVec(this), up);
+        }
+        CameraLocalUtil::recalcUpVec(&up, camWatchDir);
+    }
+
+    CameraLocalUtil::setPos(this, pos);
+    CameraLocalUtil::setUpVec(this, up);
+    CameraLocalUtil::setWatchPos(this, watchPos);
+    CameraLocalUtil::setWatchUpVec(this, CameraLocalUtil::getWatchUpVec(mCamera));
+    CameraLocalUtil::setGlobalOffset(this, CameraLocalUtil::getGlobalOffset(mCamera));
+    CameraLocalUtil::setLocalOffset(this, CameraLocalUtil::getLocalOffset(mCamera));
+    CameraLocalUtil::setFovy(this, CameraLocalUtil::getFovy(mCamera));
+    CameraLocalUtil::setRoll(this, CameraLocalUtil::getRoll(mCamera));
+}
 
 CameraParamChunkEvent* CameraManEvent::findChunk(s32 zoneID, const char* pName) const {
     CameraParamChunkID_Tmp chunkID = CameraParamChunkID_Tmp();
@@ -333,13 +345,13 @@ CameraParamChunkEvent* CameraManEvent::findChunk(s32 zoneID, const char* pName) 
     return reinterpret_cast< CameraParamChunkEvent* >(mChunkHolder->getChunk(chunkID));
 }
 
-void CameraManEvent::requestChunk(CameraParamChunkEvent* pChunk, EPriority priority, const CameraTargetArg& rArg, s32 a4) {
+void CameraManEvent::requestChunk(CameraParamChunkEvent* pChunk, EPriority priority, const CameraTargetArg& rArg, s32 frame) {
     mItems[priority].mSecond.mChunk = pChunk;
     mItems[priority].mSecond.mTargetArg.mTargetObj = rArg.mTargetObj;
     mItems[priority].mSecond.mTargetArg.mTargetMtx = rArg.mTargetMtx;
     mItems[priority].mSecond.mTargetArg.mLiveActor = rArg.mLiveActor;
     mItems[priority].mSecond.mTargetArg.mMarioActor = rArg.mMarioActor;
-    mItems[priority].mSecond._14 = a4;
+    mItems[priority].mSecond.mFrame = frame;
 }
 
 bool CameraManEvent::cleanChunkFIFO(CameraParamChunk* pChunk) {
@@ -379,35 +391,35 @@ bool CameraManEvent::isChunkFIFOEmpty() const {
     return true;
 }
 
-void CameraManEvent::sendStartInterpolateFrame(CameraParamChunkEvent* pChunk, s32 a2) {
-    u32 frames = getInterpolateFrame(pChunk, a2);
+void CameraManEvent::sendStartInterpolateFrame(CameraParamChunkEvent* pChunk, s32 frame) {
+    u32 frames = getInterpolateFrame(pChunk, frame);
 
     if (frames == 0) {
-        _15 = 1;
+        mRequestLOfsReset = true;
     }
 
     mDirector->setInterpolation(frames);
 }
 
-s32 CameraManEvent::getInterpolateFrame(CameraParamChunkEvent* pChunk, s32 a2) const {
+s32 CameraManEvent::getInterpolateFrame(CameraParamChunkEvent* pChunk, s32 frame) const {
     s32 frames = -1;
 
     if (pChunk->mEnableErpFrame != 0) {
         frames = pChunk->mExParam.mCamInt;
     }
 
-    if (frames < 0 && a2 >= 0) {
-        frames = a2;
+    if (frames < 0 && frame >= 0) {
+        frames = frame;
     }
 
     if (frames < 0) {
-        frames = 60;
+        frames = ::sDefaultBlendFrame;
     }
 
     return frames;
 }
 
-void CameraManEvent::sendFinishInterpolateFrame(CameraParamChunkEvent* pChunk, s32 a2) {
+void CameraManEvent::sendFinishInterpolateFrame(CameraParamChunkEvent* pChunk, s32 frame) {
     s32 frames = -1;
 
     if (pChunk->mEnableEndErpFrame) {
@@ -416,12 +428,12 @@ void CameraManEvent::sendFinishInterpolateFrame(CameraParamChunkEvent* pChunk, s
         frames = pChunk->mExParam.mCamInt;
     }
 
-    if (frames < 0 && a2 >= 0) {
-        frames = a2;
+    if (frames < 0 && frame >= 0) {
+        frames = frame;
     }
 
     if (frames < 0) {
-        frames = 60;
+        frames = ::sDefaultBlendFrame;
     }
 
     mDirector->setInterpolation(frames);
@@ -453,13 +465,26 @@ bool CameraManEvent::isInFIFO(CameraParamChunk* pChunk) const {
     return false;
 }
 
+void CameraManEvent::notifyActivate() {
+    mRequestReset = true;
+}
+
+void CameraManEvent::notifyDeactivate() {
+    mCamera = nullptr;
+}
+
+CameraManEvent::~CameraManEvent() {
+}
+
 bool CameraManEvent::isAnimCameraEnd(s32 zoneID, const char* pName) const {
     mHolder->getIndexOf("CAM_TYPE_ANIM");
     CameraParamChunkEvent* chunk = findChunk(zoneID, pName);
 
     if (isInFIFO(chunk)) {
-        if (chunk == mChunk && mCamera != nullptr) {
-            return reinterpret_cast< CameraAnim* >(mCamera)->isAnimEnd();
+        if (chunk == mChunk) {
+            if (mCamera != nullptr) {
+                return reinterpret_cast< CameraAnim* >(mCamera)->isAnimEnd();
+            }
         } else {
             return false;
         }

@@ -11,6 +11,10 @@
 #include <revolution/gx/GXVert.h>
 #include <revolution/wpad.h>
 
+void SpiderThreadPart_DUMMY() {
+    TVec3f a(1.0f);
+}
+
 namespace {
     static Color8 sColorPlusX(0x64, 0x64, 0x64, 0xFF);
     static Color8 sColorMinusX(0x96, 0x96, 0x96, 0xFF);
@@ -58,7 +62,7 @@ SpiderThreadPart::SpiderThreadPart(SpiderThreadMainPoint* pPointA, SpiderThreadM
         pos.add(mPointA->mPosition);
 
         s32 halfNumPoints = mNumPoints / 2;
-        s32 index = __abs(halfNumPoints - idx);
+        s32 index = MR::abs(halfNumPoints - idx);
         f32 indexNormalized = 1.0f - (static_cast< f32 >(index) / static_cast< f32 >(halfNumPoints));
 
         f32 length = mDistBetweenMainPoints - ::sFricitonLengthMin;
@@ -78,10 +82,7 @@ SpiderThreadPart::SpiderThreadPart(SpiderThreadMainPoint* pPointA, SpiderThreadM
         mPoints[idx] = new SpiderThreadPoint(pos, friction);
     }
 
-    mSide.x = 0.0f;
-    mSide.y = 0.0f;
-    mSide.z = -1.0f;
-
+    mSide.set(0.0f, 0.0f, -1.0f);
     mUp.set< f32 >(forward.y, -forward.x, 0.0f);
     mFront.set< f32 >(-forward.y, forward.x, 0.0f);
 

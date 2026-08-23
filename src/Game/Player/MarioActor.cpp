@@ -44,6 +44,10 @@
 #include <JSystem/JKernel/JKRHeap.hpp>
 #include <JSystem/JUtility/JUTVideo.hpp>
 
+void MarioActor_DUMMY() {
+    (void)JGeometry::TUtil< f32 >::acos(1.0f);
+}
+
 bool gIsLuigi;
 static f32 BASE_ROTATION = 0.0f;
 
@@ -316,7 +320,7 @@ void MarioActor::init2(const TVec3f& a, const TVec3f& b, s32 initialAnimation) {
     mBinder->_1EC._0 = false;
     MR::setBinderOffsetVec(this, &_2C4, false);
 
-    mBinder->setTriangleFilter(TriangleFilterDelegator< MarioActor >::allocateDelegator(this, &MarioActor::binderFilter));
+    mBinder->setTriangleFilter(MR::createTriangleFilterDelegator(this, &MarioActor::binderFilter));
 
     mBinder->_1EC._3 = true;
     initEffect();
@@ -1081,7 +1085,7 @@ bool MarioActor::doRush() {
             }
         }
         if (mMario->isForceStopRush()) {
-            bool received = _924->receiveMessage(0x95, getSensor("body"));
+            bool received = _924->receiveMessage(ACTMES_RUSH_DAMAGE_CANCEL, getSensor("body"));
             if (_934 && received) {
                 RushEndInfo stack_20(nullptr, 4, TVec3f(0.0f, 0.0f, 0.0f), false, 0);
                 endRush(&stack_20);

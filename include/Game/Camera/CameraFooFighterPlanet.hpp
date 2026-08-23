@@ -13,7 +13,13 @@ public:
 
     void goRoundBehind(TVec3f&, TVec3f&, TVec3f&);
 
-    f32 mAxisX;   // 0x4C
-    f32 mAxisY;   // 0x50
-    f32 mAngleA;  // 0x54
+    void setParam(f32 distMin, f32 distMax, f32 pitchMax) {
+        mDistMin = distMin;
+        mDistMax = distMax;
+        mPitchMax = pitchMax;
+    }
+
+    /* 0x4C */ f32 mDistMin;
+    /* 0x50 */ f32 mDistMax;
+    /* 0x54 */ f32 mPitchMax;
 };

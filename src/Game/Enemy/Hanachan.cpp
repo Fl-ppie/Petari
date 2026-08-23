@@ -118,7 +118,7 @@ void HanachanParts::kill() {
 // HanachanParts::attackSensor
 // HanachanParts::receiveMsgPlayerAttack
 
-bool HanachanParts::receiveMsgEnemyAttack(u32, HitSensor*, HitSensor*) {
+bool HanachanParts::receiveMsgEnemyAttack(u32 msg, HitSensor* pSender, HitSensor* pReceiver) {
     return true;
 }
 
@@ -150,7 +150,7 @@ bool HanachanParts::receiveMsgPush(HitSensor* pSender, HitSensor* pReceiver) {
 
 void HanachanParts::calcAndSetBaseMtx() {
     TPos3f mtx;
-    mtx.makeQuat(getRot());
+    mtx.makeQuat(_AC);
     mtx.setTrans(mPosition);
 
     MR::setBaseTRMtx(this, mtx);

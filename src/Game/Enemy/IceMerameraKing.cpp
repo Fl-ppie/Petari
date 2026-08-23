@@ -29,10 +29,15 @@
 // TODO: the symbol order for header funcs is out of order between JointControlDelegator funcs
 //       and Array funcs. This needs to be fixed in order to link.
 
+void dummy () {
+    TVec3f a, b;
+    a.sub(b);
+}
+
 void IceMerameraKing_FORCE_MATCH_SDATA2() {
     (void)1.0f;
     (void)0.0f;
-    f32 f3 = JGeometry::TUtil< f32 >::epsilon();
+    f32 f3 = MR::epsilon();
     (void)0.5f;
     (void)3.0f;
     (void)2.0f;
@@ -564,15 +569,9 @@ void IceMerameraKing::exeAngryDemo() {
 
     if (MR::isDemoPartLastStep("怒りデモ")) {
         if (!(_EC > 2)) {
-            TVec3f v7(mGravity * 200.0f);
-            TVec3f v8(mPosition);
-            v8.sub(v7);
-            MR::appearStarPiece(this, v8, 8, 15.0f, 70.0f, false);
+            MR::appearStarPiece(this, mPosition - mGravity * 200.0f, 8, 15.0f, 70.0f, false);
         } else {
-            TVec3f v5(mGravity * 200.0f);
-            TVec3f v6(mPosition);
-            v6.sub(v5);
-            MR::appearStarPiece(this, v6, 16, 15.0f, 70.0f, false);
+            MR::appearStarPiece(this, mPosition - mGravity * 200.0f, 16, 15.0f, 70.0f, false);
         }
         MR::startSound(this, "SE_OJ_STAR_PIECE_BURST");
         setNerve(&NrvIceMerameraKing::HostTypeNrvSearch::sInstance);
@@ -722,16 +721,7 @@ void IceMerameraKing::addVelocityToInitPos() {
     if (0.0f < mGravity.dot(v12)) {
         MR::vecKillElement(v12, mGravity, &v12);
     }
-    f32 squared = v12.squared();
-    f32 half = 0.5f;
-
-    if (squared <= 0.0000038146973f) {
-        squared = squared;
-    } else {
-        f32 inv = JGeometry::TUtil< f32 >::inv_sqrt(squared);
-        f32 v9 = inv * half;
-        v12.scale(v9);
-    }
+    v12.setLength(0.5f);
     mVelocity.add(v12);
 }
 
@@ -845,7 +835,7 @@ void IceMerameraKingShockWave::attackSensor(HitSensor* pSender, HitSensor* pRece
         TVec3f v16;
         MR::calcUpVec(&v16, this);
 
-        if (__fabsf(v15.dot(v16)) < 200.0f) {
+        if (MR::abs(v15.dot(v16)) < 200.0f) {
             MR::vecKillElement(v15, v16, &v15);
             MR::sendMsgEnemyAttackFlipMaximumToDir(pReceiver, pSender, v15);
         }

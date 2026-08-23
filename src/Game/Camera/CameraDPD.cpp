@@ -24,7 +24,8 @@ namespace {
 
 CameraDPD::CameraDPD(const char* pName)
     : Camera(pName), mCorePadDistToDisplay(), mRealPointPos(0.0f, 0.0f), mBlendPointPos(0.0f, 0.0f), mResetPointingPos(true), mCameraState(), mDist(),
-      mFovy(40.0f), mAngleXRange(PI / 2.0f), mAngleYRange(PI / 2.0f), mRotate(), mSpeedBlendRate(0.05f), mBlendFriction(0.99f), _B4(), _B8() {
+      mFovy(40.0f), mAngleXRange(PI / 2.0f), mAngleYRange(PI / 2.0f), mRotate(), mSpeedBlendRate(0.05f), mBlendFriction(0.99f), mIsVertical(),
+      mAngleYMin() {
     mMtx.identity();
 }
 
@@ -79,9 +80,6 @@ void CameraDPD::reset() {
 }
 
 CameraTargetObj* CameraDPD::calc() {
-    // FIXME: float regswap
-    // https://decomp.me/scratch/bUvS4
-
     if (mCameraState == CameraState_1) {
         mMtx.identity();
         mMtx.setXDir(CameraLocalUtil::getTarget(this)->getSideVec());
@@ -96,9 +94,8 @@ CameraTargetObj* CameraDPD::calc() {
     MR::getCorePadPointingPos(&pointPos, WPAD_CHAN0);
 
     if (mResetPointingPos) {
-        // FIXME: float regswap
         pointPos.set(0.0f, 0.0f);
-        if (__fabsf(mRealPointPos.x) < 0.5f && __fabsf(mRealPointPos.y) < 0.5f) {
+        if (MR::abs(mRealPointPos.x) < 0.5f && MR::abs(mRealPointPos.y) < 0.5f) {
             mResetPointingPos = false;
         }
     }
@@ -135,13 +132,13 @@ CameraTargetObj* CameraDPD::calc() {
 
     TPos3f panYMtx;
     panYMtx.identity();
-    if (_B4) {
-        f32 f1 = mBlendPointPos.y * MR::max(mAngleYRange, _B8);
+    if (mIsVertical) {
+        f32 f1 = mBlendPointPos.y * MR::max(mAngleYRange, mAngleYMin);
         f32 f2;
-        if (mAngleYRange < _B8) {
+        if (mAngleYRange < mAngleYMin) {
             f2 = f1 > mAngleYRange ? mAngleYRange : f1;
         } else {
-            f2 = f1 < -_B8 ? -_B8 : f1;
+            f2 = f1 < -mAngleYMin ? -mAngleYMin : f1;
         }
     }
     panYMtx.makeRotate(TVec3f(1.0f, 0.0f, 0.0f), mBlendPointPos.y * mAngleYRange);

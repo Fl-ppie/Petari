@@ -258,6 +258,12 @@ namespace JGeometry {
             this->mMtx[2][2] = rSrcZ.z;
         }
 
+        void getEulerDegree(TVec3f& rDest) const {
+            TVec3f rot;
+            getEulerXYZ(rot);
+            rDest.set< f32 >(rot.x * (180.0f / PI), rot.y * (180.0f / PI), rot.z * (180.0f / PI));
+        }
+
         void getEuler(TVec3f& rDest) const {
             getEulerXYZ(rDest);
         }
@@ -332,9 +338,9 @@ namespace JGeometry {
             f32 xz = 2.0f * q.x * q.z;
             f32 yz = 2.0f * q.y * q.z;
 
+            f32 wz = 2.0f * q.w * q.z;
             f32 wx = 2.0f * q.w * q.x;
             f32 wy = 2.0f * q.w * q.y;
-            f32 wz = 2.0f * q.w * q.z;
 
             this->mMtx[0][0] = 1.0f - yy - zz;
             this->mMtx[0][1] = xy - wz;
@@ -347,6 +353,12 @@ namespace JGeometry {
             this->mMtx[2][0] = xz - wy;
             this->mMtx[2][1] = yz + wx;
             this->mMtx[2][2] = 1.0f - xx - yy;
+        }
+
+        f32 getRotate(TVec3f& rAxis) const {
+            TQuat4f rot;
+            getQuat(rot);
+            return (f64)rot.getRotate(rAxis);
         }
 
         void getScale(TVec3f& rDest) const;
@@ -375,6 +387,7 @@ namespace JGeometry {
             //    SegmentGravity::updateLocalParam
             //    SurfRay::updateRotate
             //    Plant::initLeaf
+            //    WaterRoadModelInfo::initPoints
             // }
             //
             // DOES NOT MATCH {
@@ -389,7 +402,14 @@ namespace JGeometry {
             //    BreakableCage::calcAndSetBaseMtx (regswap)
             //    CocoNut::updateRotate (regswap)
             //    FirePressureRadiate::calcJointCannon (regswap)
+            //    CameraMedianPlanet::rotate33 (regswap)
+            //    CameraMedianTower::calc (regswap)
+            //    CameraRailWatch::calc (regswap)
+            //    CameraDirector::calcViewMtxFromPoseParam (regswap)
+            //
+            //    CameraFixedThere::updateNormalUpVec (instruction mismatch!!)
             // }
+            //
 
             f32 s = sin(angle);
             f32 c = cos(angle);
@@ -462,20 +482,11 @@ namespace JGeometry {
         }
 
         void mult33(const TVec3f& rSrc, TVec3f& rDst) const {
-            f32 a32, a22, a12, a11, a21, vx, a31, vy, a23, a33, a13;
-            a32 = this->mMtx[2][1];
-            a22 = this->mMtx[1][1];
-            a12 = this->mMtx[0][1];
-            a31 = this->mMtx[2][0];
-            a21 = this->mMtx[1][0];
-            a11 = this->mMtx[0][0];
-            a33 = this->mMtx[2][2];
-            a13 = this->mMtx[0][2];
-            a23 = this->mMtx[1][2];
-            f32 x, y;
-            vx = rSrc.x;
-            vy = rSrc.y;
-            rDst.set< f32 >(rSrc.z * a13 + (vx * a11 + vy * a12), rSrc.z * a23 + (vx * a21 + vy * a22), rSrc.z * a33 + (rSrc.x * a31 + rSrc.y * a32));
+            rDst.set< f32 >(rSrc.x * get(0, 0) + rSrc.y * get(0, 1) + rSrc.z * get(0, 2),
+
+                            rSrc.x * get(1, 0) + rSrc.y * get(1, 1) + rSrc.z * get(1, 2),
+
+                            rSrc.x * get(2, 0) + rSrc.y * get(2, 1) + rSrc.z * get(2, 2));
         }
     };
 
@@ -530,9 +541,27 @@ namespace JGeometry {
             this->mMtx[2][3] = 0.0f;
         }
 
-        inline void identityAndSetTrans(const TVec3f& rSrc) {
+        inline void makeTrans(const TVec3f& rTrans) {
             this->identity();
-            this->setTrans(rSrc);
+            setTrans(rTrans);
+        }
+
+        inline void makeTrans(f32 x, f32 y, f32 z) {
+            this->mMtx[0][0] = 1.0f;
+            this->mMtx[1][0] = 0.0f;
+            this->mMtx[2][0] = 0.0f;
+
+            this->mMtx[0][1] = 0.0f;
+            this->mMtx[1][1] = 1.0f;
+            this->mMtx[2][1] = 0.0f;
+
+            this->mMtx[0][2] = 0.0f;
+            this->mMtx[1][2] = 0.0f;
+            this->mMtx[2][2] = 1.0f;
+
+            this->mMtx[0][3] = x;
+            this->mMtx[1][3] = y;
+            this->mMtx[2][3] = z;
         }
 
         void setTR(const TVec3f& a1, const TVec3f& a2, const TVec3f& a3, const TVec3f& a4) {
@@ -680,7 +709,11 @@ namespace JGeometry {
     public:
         typedef f32 ArrType[4];
         void set(const ArrType*);
-        void set(const SMatrix44C< T >& rSrc);
+
+        void set(const SMatrix44C< T >& rSrc) {
+            JMath::gekko_ps_copy16(this, rSrc);
+        }
+
         void set(T rxx, T ryx, T rzx, T tx, T rxy, T ryy, T rzy, T ty, T rxz, T ryz, T rzz, T tz, T wx, T wy, T wz, T ww) {
             mMtx[0][0] = rxx;
             mMtx[0][1] = ryx;
@@ -819,11 +852,16 @@ namespace JGeometry {
         }
         void concat(const T& rSrc);
 
-        void invert(const TMatrix44< T >& rDest);
+        void invert(const TMatrix44< T >& rSrc);
 
         inline void mult(const TVec3f& rSrc, TVec3f& rDest) const {
-            TVec4f pos(rSrc.x * this->mMtx[0][0] + rSrc.z * this->mMtx[0][2], rSrc.y * this->mMtx[1][1] + rSrc.z * this->mMtx[1][2],
-                       rSrc.z * this->mMtx[2][2] + this->mMtx[2][3], -rSrc.z);
+            TVec4f pos(rSrc.x * this->mMtx[0][0] + rSrc.z * this->mMtx[0][2],
+
+                       rSrc.y * this->mMtx[1][1] + rSrc.z * this->mMtx[1][2],
+
+                       rSrc.z * this->mMtx[2][2] + this->mMtx[2][3],
+
+                       -rSrc.z);
 
             rDest.scale(1.0f / pos.w, *pos.toTVec3());
         }

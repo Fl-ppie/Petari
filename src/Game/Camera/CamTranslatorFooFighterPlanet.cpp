@@ -6,19 +6,8 @@ CamTranslatorFooFighterPlanet::CamTranslatorFooFighterPlanet(CameraFooFighterPla
 
 void CamTranslatorFooFighterPlanet::setParam(const CameraParamChunk* pChunk) {
     CameraGeneralParam* general = pChunk->mGeneralParam;
-    CameraFooFighterPlanet* camera = mCamera;
 
-    f32 axisX;
-    f32 axisY;
-    f32 angleA;
-
-    angleA = general->mAngleA;
-    axisY = general->mAxis.y;
-    axisX = general->mAxis.x;
-
-    camera->mAxisX = axisX;
-    camera->mAxisY = axisY;
-    camera->mAngleA = angleA;
+    mCamera->setParam(general->mAxis.x, general->mAxis.y, general->mAngleA);
 }
 
 Camera* CamTranslatorFooFighterPlanet::getCamera() const {

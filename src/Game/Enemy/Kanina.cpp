@@ -161,7 +161,7 @@ void Kanina::init(const JMapInfoIter& rIter) {
         initForType(rIter, KaninaType_Blue);
     }
 
-    MR::initStarPointerTarget(this, ::sSensorRadius, TVec3f::makeZeroVec());
+    MR::initStarPointerTarget(this, ::sSensorRadius);
     initNerve(&NrvKanina::HostTypeAppear::sInstance);
     MR::needStageSwitchReadAppear(this, rIter);
     MR::syncStageSwitchAppear(this);
@@ -324,7 +324,7 @@ bool Kanina::receiveMsgPush(HitSensor* pSender, HitSensor* pReceiver) {
     return true;
 }
 
-bool Kanina::receiveTrample(HitSensor*, HitSensor*) {
+bool Kanina::receiveTrample(HitSensor* pSender, HitSensor* pReceiver) {
     if (!isNerve(&NrvKanina::HostTypeAttack::sInstance)) {
         setNerve(&NrvKanina::HostTypeGuard::sInstance);
         return true;
