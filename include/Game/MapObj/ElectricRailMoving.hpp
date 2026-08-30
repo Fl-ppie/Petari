@@ -15,6 +15,7 @@ public:
     virtual void attackSensor(HitSensor*, HitSensor*);
 
     u8 _8C;
+    u8 _8D;
 };
 
 class ElectricRailMoving : public LiveActor {
@@ -36,15 +37,15 @@ public:
     void drawRailGX(f32) const;
     void drawPlane(f32, f32, f32, f32) const;
     void drawPlaneGX(f32, f32, f32, f32) const;
-    void setVertexAttribute(int, int, f32, f32, f32, f32, f32, PosAttrFunc, TexAttrFunc);
+    void setVertexAttribute(int, int, f32, f32, f32, f32, PosAttrFunc, TexAttrFunc) const;
     void updateHitSensorPos();
-    void updatePointPos();
+    bool updatePointPos();
     void updatePointPosAndModel();
     bool isValidCoord(f32) const;
     f32 getRepeatedCoord(f32) const;
     void calcPointPos(TVec3f*, f32) const;
     void move();
-    void exeDisppear();
+    void exeDisappear();
     void exeDisappeared();
     void exeWait();
 
@@ -53,13 +54,16 @@ public:
     /* 0x94 */ f32 mSegmentLength;
     /* 0x98 */ s32 mStackHeight;
     TPos3f _9C;
-    u32 _CC;
+    u8 _CC;
+    u8 _CD;
+    u8 _CE;
+    u8 _CF;
     /* 0xD0 */ TVec3f* mSensorOffsets;
     /* 0xD4 */ ElectricRailMovingPoint* mMovingPoints;
-    u32 _D8;
-    u32 _DC;
+    s32 _D8;
+    void* _DC;
     u32 _E0;
-    u32 _E4;
+    s32 _E4;
     TVec3f* _E8;
     f32 _EC;
     f32 _F0;
