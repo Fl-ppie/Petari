@@ -1591,7 +1591,7 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/Map/FileSelectIconID.cpp"),
             Object(MatchingFor(ALL), "Game/Map/FileSelectItem.cpp"),
             Object(MatchingFor(ALL), "Game/Map/FileSelectModel.cpp"),
-            Object(MatchingFor(), "Game/Map/FileSelector.cpp"),
+            Object(MatchingFor(ALL), "Game/Map/FileSelector.cpp"),
             Object(MatchingFor(), "Game/Map/FileSelectSky.cpp"),
             Object(MatchingFor(ALL), "Game/Map/FishGroup.cpp"),
             Object(MatchingFor(), "Game/Map/Flag.cpp"),

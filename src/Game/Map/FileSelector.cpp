@@ -596,7 +596,7 @@ void FileSelector::setFileInfo(s32 id) {
     bool isViewCompleteEnding = ::isUserFileViewCompleteEnding(this, id);
     bool isViewNormalEnding = ::isUserFileViewNormalEnding(this, id);
     s32 starPieceNum = ::getUserFileStarPieceNum(this, id);
-    s32 powerStarNum = ::getUserFilePowerStarNum(this, id);
+    s32 powerStarNum = 100;
     s32 missCount = getMissCount(id);
     bool isUserFileMario = !isUserFileLuigi(id);
 
