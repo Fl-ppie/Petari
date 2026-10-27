@@ -1025,6 +1025,10 @@ void StorySequenceExecutor::decideNextStageForGalaxyOut(GalaxyMoveArgument* pMov
 }
 
 void StorySequenceExecutor::overwriteGalaxyNameAfterLoading(GalaxyMoveArgument* pMoveArgument) {
+    setNextStageToAstroGalaxy(pMoveArgument);
+    return;
+
+    /* Archipelago
     if (GameDataFunction::hasGrandStar(1)) {
         setNextStageToAstroGalaxy(pMoveArgument);
     } else if (GameDataFunction::isPassedStoryEvent("ピーチ城浮上後") || !GameDataFunction::isDataMario()) {
@@ -1040,6 +1044,7 @@ void StorySequenceExecutor::overwriteGalaxyNameAfterLoading(GalaxyMoveArgument* 
         pMoveArgument->mStageName = "PeachCastleGardenGalaxy";
         pMoveArgument->mScenarioNo = 1;
     }
+    */
 }
 
 void StorySequenceExecutor::setNextStageToAstroGalaxyOrDome(GalaxyMoveArgument* pMoveArgument) {
