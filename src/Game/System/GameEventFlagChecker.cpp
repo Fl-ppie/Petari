@@ -3,6 +3,7 @@
 #include "Game/System/GameDataHolder.hpp"
 #include "Game/System/GameEventFlagStorage.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
+#include "Game/Util/EventUtil.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 
 GameEventFlagChecker::GameEventFlagChecker(GameDataHolder* pHolder) : mDataHolder(pHolder), mFlagStorage() {
@@ -25,7 +26,8 @@ bool GameEventFlagChecker::canOn(const char* pFlagName) const {
 
         return powerStarOpenNum <= currentPowerStarNum;
     case GameEventFlag::Type_SpecialStar:
-        return mDataHolder->hasPowerStar(pFlag->mGalaxyName, pFlag->mStarID);
+        return MR::hasGrandStar(pFlag->mCondition2);
+        // Archipelago: return mDataHolder->hasPowerStar(pFlag->mGalaxyName, pFlag->mStarID);
     case GameEventFlag::Type_EventFlag:
         const char* pRequirement1 = pFlag->mRequirement1;
         const char* pRequirement2 = pFlag->mRequirement2;
