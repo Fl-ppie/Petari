@@ -117,7 +117,8 @@ void GameSequenceProgress::startScene() {
         }
 
         if (!GameDataFunction::isPassedStoryEvent("スピン権利")) {
-            MR::setPlayerSwingPermission(false);
+            MR::setPlayerSwingPermission(true);
+            // Archipelago: MR::setPlayerSwingPermission(false);
         }
     }
 
