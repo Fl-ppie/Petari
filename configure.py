@@ -2465,7 +2465,7 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/Screen/ReplaceTagProcessor.cpp"),
             Object(MatchingFor(ALL), "Game/Screen/SaveIcon.cpp"),
             Object(
-                MatchingFor(JPN, KOR),
+                MatchingFor(ALL),
                 "Game/Screen/ScenarioSelectLayout.cpp",
                 mw_version="GC/3.0a3.2",
             ),

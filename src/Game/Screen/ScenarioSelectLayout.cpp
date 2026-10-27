@@ -475,6 +475,11 @@ bool ScenarioSelectLayout::calcDisplayScenarioNum(s32* pNormalScenarioCompleteNu
     bool isNewScenario = false;
     s32 index;
 
+    *pNormalScenarioCompleteNum = MR::getCurrentStageNormalScenarioNum();
+    *pExtraScenarioCompleteNum = getHiddenScenarioNum();
+
+    // Archipelago
+    /*
     for (*pNormalScenarioCompleteNum = 0; (index = *pNormalScenarioCompleteNum) < MR::getCurrentStageNormalScenarioNum();
          *pNormalScenarioCompleteNum += 1) {
         if (MR::hasPowerStarInCurrentStage(index + 1)) {
@@ -486,13 +491,12 @@ bool ScenarioSelectLayout::calcDisplayScenarioNum(s32* pNormalScenarioCompleteNu
         break;
     }
 
-    *pExtraScenarioCompleteNum = 0;
-
     for (s32 i = 0; i < getHiddenScenarioNum(); i++) {
         if (MR::hasPowerStarInCurrentStage(MR::getCurrentStageNormalScenarioNum() + i + 1)) {
             *pExtraScenarioCompleteNum += 1;
         }
     }
+    */
 
     return isNewScenario;
 }
@@ -526,7 +530,13 @@ void ScenarioSelectLayout::appearAllStar(s32 normalScenarioCompleteNum, s32 extr
         for (s32 j = 0; j < getHiddenScenarioNum(); j++) {
             s32 scenarioNo = MR::getCurrentStageNormalScenarioNum() + j + 1;
 
-            if (MR::hasPowerStarInCurrentStage(scenarioNo)) {
+            // Archipelago: if (MR::hasPowerStarInCurrentStage(scenarioNo)) {
+            // Archipelago:     appearStar(starIndex, scenarioNo, isNewScenario ? 1 : 2);
+            // Archipelago:     starIndex++;
+            // Archipelago: }
+
+            // Archipelago
+            if (!MR::isEqualStageName("FactoryGalaxy") || j != 0 || (j == 0 && MR::hasPowerStarInCurrentStage(5))) {
                 appearStar(starIndex, scenarioNo, isNewScenario ? 1 : 2);
                 starIndex++;
             }
