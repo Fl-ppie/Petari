@@ -87,6 +87,11 @@ bool GameDataConst::isPowerStarSpecial(const char* pGalaxyName, s32 starId, cons
             continue;
         }
 
+        // Archipelago
+        if (!accessor.getRequirement()) {
+            continue;
+        }
+
         if (accessor.getStarId() != starId) {
             continue;
         }
