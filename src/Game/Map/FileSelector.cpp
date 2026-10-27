@@ -1093,11 +1093,11 @@ void FileSelector::exeFileConfirm() {
         mOperationButton->appear();
         mBackButton->appear();
 
-        if (isUserFileAppearLuigi(_B4->_140)) {
+        // Archipelago: if (isUserFileAppearLuigi(_B4->_140)) {
             bool isAppear = !isUserFileLuigi(_B4->_140);
 
             mBrosButton->appear(isAppear);
-        }
+        // Archipelago: }
 
         if (MR::isDead(mFileInfo)) {
             setFileInfo(_B4->_140);
