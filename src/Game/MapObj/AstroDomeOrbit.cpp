@@ -65,20 +65,22 @@ void AstroDomeOrbit::drawBloom() const {
     drawSide(::cBloomWidth, false, ::cBloomHeight);
 }
 
-void AstroDomeOrbit::setup(s32 radiusIdx) {
-    s32 miniNum = MiniatureGalaxyFunction::getMiniatureGalaxyNum();
-    const f32* radii = ::cRadiusLastDome;
+void AstroDomeOrbit::setup(f32 radius, f32 angle) {
+    mOrbitRadius = radius;
+    mAngle = angle;
+    // Archipelago: s32 miniNum = MiniatureGalaxyFunction::getMiniatureGalaxyNum();
+    // Archipelago: const f32* radii = ::cRadiusLastDome;
 
-    if (miniNum == 5) {
-        radii = ::cRadius;
-    }
+    // Archipelago: if (miniNum == 5) {
+    // Archipelago:     radii = ::cRadius;
+    // Archipelago: }
 
-    mOrbitRadius = radii[radiusIdx];
-    mAngle = ::cGalaxyRotateCoordOffset * radiusIdx;
+    // Archipelago: mOrbitRadius = radii[radiusIdx];
+    // Archipelago: mAngle = ::cGalaxyRotateCoordOffset * radiusIdx;
 
-    if (radiusIdx >= 4) {
-        mRotation.set(::cRotateOutermost);
-    }
+    // Archipelago: if (radiusIdx >= 4) {
+    // Archipelago:     mRotation.set(::cRotateOutermost);
+    // Archipelago: }
 }
 
 void AstroDomeOrbit::moveCoord() {

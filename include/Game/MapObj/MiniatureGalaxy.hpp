@@ -79,4 +79,8 @@ public:
     /* 0x1B8 */ J3DTexMtx mTensTexMtx;
     /* 0x24C */ AstroDomeOrbit* mOrbit;
     /* 0x250 */ GalaxyNamePlate* mNamePlate;
+
+    // Archipelago
+    /* 0x254 */ f32 mRadius;
+    /* 0x258 */ f32 mAngle;
 };

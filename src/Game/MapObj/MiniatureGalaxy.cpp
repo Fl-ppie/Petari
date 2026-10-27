@@ -127,10 +127,20 @@ void MiniatureGalaxy::init(const JMapInfoIter& rIter) {
     MR::registerDemoSimpleCastAll(mNamePlate);
 
     makeActorDead();
+    
+    // Archipelago
+    f32 arg1 = 0.0f;
+    MR::getJMapInfoArg1NoInit(rIter, &arg1);
+    mRadius = arg1;
+
+    f32 arg2 = 0.0f;
+    MR::getJMapInfoArg2NoInit(rIter, &arg2);
+    mAngle = arg2;
 }
 
 void MiniatureGalaxy::initAfterPlacement() {
-    mOrbit->setup(MiniatureGalaxyFunction::calcMiniatureGalaxyIndex(this));
+    mOrbit->setup(mRadius, mAngle);
+    // Archipelago: mOrbit->setup(MiniatureGalaxyFunction::calcMiniatureGalaxyIndex(this));
 }
 
 void MiniatureGalaxy::appear() {

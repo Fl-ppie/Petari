@@ -13,7 +13,8 @@ public:
     virtual void draw() const;
 
     void drawBloom() const;
-    void setup(s32);
+    void setup(f32, f32);
+    // Archipelago: void setup(s32);
     void moveCoord();
     void calcGalaxyPos(TVec3f*) const;
     void initDraw(const Color8&) const;
