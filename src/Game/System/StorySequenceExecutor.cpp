@@ -854,71 +854,71 @@ void StorySequenceExecutor::decideNextEventForClearGalaxy(GalaxyMoveArgument* pM
             if (!GameSequenceFunction::hasPowerStarYetAtResultSequence()) {
                 if (isEqualStageScenarioBefore("HeavensDoorGalaxy", 1)) {
                     setNextStageToAstroGalaxy(pMoveArgument);
-                    prepareDemoSequence(::cDemoGrandStar1ResultFirst);
+                    // Archipelago: prepareDemoSequence(::cDemoGrandStar1ResultFirst);
                 }
 
                 if (isEqualStageScenarioBefore("EggStarGalaxy", 1)) {
-                    prepareDemoSequence(::cDemoPowerStarResultAstroDomeWithSave);
+                    // Archipelago: prepareDemoSequence(::cDemoPowerStarResultAstroDomeWithSave);
                     setNextStageToAstroDome(pMoveArgument);
                 }
 
                 if (isEqualStageScenarioBefore("EggStarGalaxy", 2)) {
-                    prepareDemoSequence(::cDemoNewGalaxyDiscover);
+                    // Archipelago: prepareDemoSequence(::cDemoNewGalaxyDiscover);
                     setNextStageToAstroDome(pMoveArgument);
                 }
 
                 if (GameDataFunction::isOnJustGameEventFlag("EventKinopioExplorerRescued")) {
-                    prepareDemoSequence(::cDemoKinopioRescued);
+                    // Archipelago: prepareDemoSequence(::cDemoKinopioRescued);
                     setNextStageToAstroGalaxy(pMoveArgument);
                 }
 
                 if (isEqualStageScenarioBefore("TriLegLv1Galaxy", 1)) {
-                    prepareDemoSequence(::cDemoTorchLecture);
+                    // Archipelago: prepareDemoSequence(::cDemoTorchLecture);
                     setNextStageToAstroGalaxy(pMoveArgument);
                 }
 
                 if (GameDataFunction::isOnJustGameEventFlag("EventCometStarter")) {
-                    prepareDemoSequence(::cDemoTrickCometLecture);
+                    // Archipelago: prepareDemoSequence(::cDemoTrickCometLecture);
                     setNextStageToAstroGalaxy(pMoveArgument);
                 }
 
                 if (isEqualStageScenarioBefore("KoopaBattleVs1Galaxy", 1)) {
-                    prepareDemoSequence(::cDemoRosettaTalkAboutKoopa);
+                    // Archipelago: prepareDemoSequence(::cDemoRosettaTalkAboutKoopa);
                     setNextStageToAstroGalaxy(pMoveArgument);
                 }
 
                 if (GameDataFunction::isOnJustGameEventFlag("SpecialStarLuigiRescued")) {
-                    prepareDemoSequence(::cDemoLuigiRescued);
+                    // Archipelago: prepareDemoSequence(::cDemoLuigiRescued);
                     setNextStageToAstroGalaxy(pMoveArgument);
                 }
 
                 if (isEqualStageScenarioBefore("KoopaJrShipLv1Galaxy", 1)) {
-                    prepareDemoSequence(::cDemoRosettaTalkAstroDomeRecover);
+                    // Archipelago: prepareDemoSequence(::cDemoRosettaTalkAstroDomeRecover);
                     setNextStageToAstroGalaxy(pMoveArgument);
                 }
 
                 if (isEqualStageScenarioBefore("KoopaBattleVs2Galaxy", 1)) {
-                    prepareDemoSequence(::cDemoGrandStarReturn5);
+                    // Archipelago: prepareDemoSequence(::cDemoGrandStarReturn5);
                     setNextStageToAstroGalaxy(pMoveArgument);
-                    prepareDemoSequence(::cDemoRosettaTalkCountDownStart);
+                    // Archipelago: prepareDemoSequence(::cDemoRosettaTalkCountDownStart);
                 }
 
                 if (isEqualStageScenarioBefore("FloaterOtaKingGalaxy", 1)) {
-                    prepareDemoSequence(::cDemoGrandStarReturn6);
+                    // Archipelago: prepareDemoSequence(::cDemoGrandStarReturn6);
                     setNextStageToAstroGalaxy(pMoveArgument);
 
                     if (!GameDataFunction::canOnGameEventFlag("KoopaBattleVs3Galaxy")) {
-                        prepareDemoSequence(::cDemoRosettaTalkTorchProgress);
+                        // Archipelago: prepareDemoSequence(::cDemoRosettaTalkTorchProgress);
                     }
                 }
 
                 if (stageResultSequenceChecker.isJustGetGreenStarFirst()) {
-                    prepareDemoSequence(::cDemoGreenStarGetFirst);
+                    // Archipelago: prepareDemoSequence(::cDemoGreenStarGetFirst);
                     setNextStageToAstroGalaxy(pMoveArgument);
                 }
 
                 if (GameDataFunction::isOnJustGameEventFlag("SpecialStarGreenAll")) {
-                    prepareDemoSequence(::cDemoGreenStarRelease);
+                    // Archipelago: prepareDemoSequence(::cDemoGreenStarRelease);
                     setNextStageToAstroGalaxy(pMoveArgument);
                 }
 
@@ -926,8 +926,8 @@ void StorySequenceExecutor::decideNextEventForClearGalaxy(GalaxyMoveArgument* pM
                     MR::Vector< MR::FixedArray< const StorySequenceExecutorType::DemoSequenceInfo*, 8 > > arr =
                         MR::Vector< MR::FixedArray< const StorySequenceExecutorType::DemoSequenceInfo*, 8 > >();
 
-                    getOptionalDemoForClearGalaxy(&arr, pMoveArgument);
-                    prepareDemoSequence(arr);
+                    // Archipelago: getOptionalDemoForClearGalaxy(&arr, pMoveArgument);
+                    // Archipelago: prepareDemoSequence(arr);
                     return;
                 }
             }
@@ -935,7 +935,7 @@ void StorySequenceExecutor::decideNextEventForClearGalaxy(GalaxyMoveArgument* pM
             MR::Vector< MR::FixedArray< const StorySequenceExecutorType::DemoSequenceInfo*, 8 > > arr =
                 MR::Vector< MR::FixedArray< const StorySequenceExecutorType::DemoSequenceInfo*, 8 > >();
 
-            getOptionalDemoForClearGalaxy(&arr, pMoveArgument);
+            // Archipelago: getOptionalDemoForClearGalaxy(&arr, pMoveArgument);
 
             if (GameDataConst::isGrandStar(mStageName, mScenarioNo)) {
                 prepareDemoSequence(::cDemoGrandStarResult);
@@ -954,7 +954,7 @@ void StorySequenceExecutor::decideNextEventForClearGalaxy(GalaxyMoveArgument* pM
                 }
             }
 
-            prepareDemoSequence(arr);
+            // Archipelago: prepareDemoSequence(arr);
         }
     } else {
         mNextNerve = GET_NERVE_ANON(StorySequenceExecutorIdle);
