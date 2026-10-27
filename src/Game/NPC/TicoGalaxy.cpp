@@ -54,7 +54,10 @@ void TicoGalaxy::startEat() {
 }
 
 bool TicoGalaxy::enableAppear() {
-    return MR::isAppearGalaxy(mGalaxyName);
+    // Converts the Luma's starbit index into required grand star number
+    s32 conversionTable[] = {0, 1, 2, 5, 5, 4, 3};
+    return MR::hasGrandStar(conversionTable[_1EC]);
+    // Archipelago: return MR::isAppearGalaxy(mGalaxyName);
 }
 
 void TicoGalaxy::initStarPieceSaveData(const JMapInfoIter& rIter) {
