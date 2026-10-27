@@ -1266,9 +1266,11 @@ s32 StorySequenceExecutor::calcAproposScenarioNoOnAstroGalaxy() const {
         return 2;
     }
 
+    /* Archipelago
     if (GameDataFunction::isOnJustGameEventFlag("SpecialStarGrand1")) {
         return 4;
     }
+    */
 
     return 1;
 }
