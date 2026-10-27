@@ -172,15 +172,15 @@ void LuigiNPC::init(const JMapInfoIter& rIter) {
         return;
     }
 
-    if (MR::isOnLuigiHidingCurrentStage()) {
+    // Archipelago: if (MR::isOnLuigiHidingCurrentStage()) {
         makeActorAppeared();
 
         if (MR::isValidSwitchB(this)) {
             MR::onSwitchB(this);
         }
-    } else {
-        makeActorDead();
-    }
+    // Archipelago: } else {
+    // Archipelago:     makeActorDead();
+    // Archipelago: }
 }
 
 void LuigiNPC::initAfterPlacement() {

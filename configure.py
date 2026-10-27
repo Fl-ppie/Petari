@@ -2010,7 +2010,7 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/NPC/Kinopio.cpp"),
             Object(MatchingFor(), "Game/NPC/KinopioAstro.cpp"),
             Object(MatchingFor(ALL), "Game/NPC/KoopaJr.cpp"),
-            Object(MatchingFor(KOR), "Game/NPC/LuigiNPC.cpp"),
+            Object(MatchingFor(ALL), "Game/NPC/LuigiNPC.cpp"),
             Object(MatchingFor(ALL), "Game/NPC/MiiDatabase.cpp"),
             Object(MatchingFor(ALL), "Game/NPC/MiiFaceIcon.cpp"),
             Object(MatchingFor(ALL), "Game/NPC/MiiFaceIconHolder.cpp"),
