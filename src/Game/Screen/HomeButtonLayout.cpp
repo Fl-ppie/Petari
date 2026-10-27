@@ -75,13 +75,13 @@ HomeButtonLayout::HomeButtonLayout() : LayoutActor("HOMEボタン", false), mMen
 }
 
 void HomeButtonLayout::init(const JMapInfoIter& rIter) {
-    RSO::setupRsoHomeButtonMenu();
+    // Archipelago: RSO::setupRsoHomeButtonMenu();
 
     mMenuContext = new HomeButtonMenuContext();
 
-    RSO::HBMCreate(mMenuContext->mHomeButtonInfo);
+    // Archipelago: RSO::HBMCreate(mMenuContext->mHomeButtonInfo);
     MR::setLayoutDefaultAllocator();
-    RSO::HBMSetAdjustFlag(MR::isScreen16Per9());
+    // Archipelago: RSO::HBMSetAdjustFlag(MR::isScreen16Per9());
     initNerve(GET_NERVE(HomeButtonLayout, HomeButtonLayoutDeactive));
     appear();
 
@@ -131,41 +131,41 @@ void HomeButtonLayout::exeActive() {
         mFlag.mIsHidden = false;
         mFlag.mIsOffCalcAnim = false;
 
-        RSO::HBMInit();
-        RSO::HBMSetAdjustFlag(MR::isScreen16Per9());
+        // Archipelago: RSO::HBMInit();
+        // Archipelago: RSO::HBMSetAdjustFlag(MR::isScreen16Per9());
     }
 
     updateController();
-    RSO::HBMCalc(mMenuContext->mControllerData);
+    // Archipelago: RSO::HBMCalc(mMenuContext->mControllerData);
 
-    if (RSO::HBMGetSelectBtnNum() == HBM_SELECT_NULL) {
-        return;
-    }
+    // Archipelago: if (RSO::HBMGetSelectBtnNum() == HBM_SELECT_NULL) {
+    // Archipelago:     return;
+    // Archipelago: }
 
     bool bVar1 = false;
 
-    switch (RSO::HBMGetSelectBtnNum()) {
-    case HBM_SELECT_HOMEBTN:
-        GameSystemFunction::onHomeButtonMenuCloseAllRumble();
-        break;
-    case HBM_SELECT_BTN1:
-        AudWrap::getSystem()->preProcessToReset();
-        bVar1 = true;
-        GameSystemFunction::requestGoWiiMenu(true);
-        GameSystemFunction::onHomeButtonMenuEndAllRumble();
-        MR::setStarPointerModeBase();
-        break;
-    case HBM_SELECT_BTN2:
-        if (!_25) {
-            AudWrap::getSystem()->preProcessToReset();
-        }
+    // Archipelago: switch (RSO::HBMGetSelectBtnNum()) {
+    // Archipelago: case HBM_SELECT_HOMEBTN:
+    // Archipelago:     GameSystemFunction::onHomeButtonMenuCloseAllRumble();
+    // Archipelago:     break;
+    // Archipelago: case HBM_SELECT_BTN1:
+    // Archipelago:     AudWrap::getSystem()->preProcessToReset();
+    // Archipelago:     bVar1 = true;
+    // Archipelago:     GameSystemFunction::requestGoWiiMenu(true);
+    // Archipelago:     GameSystemFunction::onHomeButtonMenuEndAllRumble();
+    // Archipelago:     MR::setStarPointerModeBase();
+    // Archipelago:     break;
+    // Archipelago: case HBM_SELECT_BTN2:
+    // Archipelago:     if (!_25) {
+    // Archipelago:         AudWrap::getSystem()->preProcessToReset();
+    // Archipelago:     }
 
-        bVar1 = true;
-        GameSystemFunction::requestResetGameSystem(true);
-        GameSystemFunction::onHomeButtonMenuEndAllRumble();
-        MR::setStarPointerModeBase();
-        break;
-    }
+    // Archipelago:     bVar1 = true;
+    // Archipelago:     GameSystemFunction::requestResetGameSystem(true);
+    // Archipelago:     GameSystemFunction::onHomeButtonMenuEndAllRumble();
+    // Archipelago:     MR::setStarPointerModeBase();
+    // Archipelago:     break;
+    // Archipelago: }
 
     if (!bVar1) {
         AudWrap::getSystem()->exitHomeButtonMenu();
@@ -212,7 +212,7 @@ void HomeButtonLayout::draw() const {
 
     GXSetCullMode(GX_CULL_NONE);
     GXSetZMode(GX_FALSE, GX_NEVER, GX_FALSE);
-    RSO::HBMDraw();
+    // Archipelago: RSO::HBMDraw();
 }
 
 void HomeButtonLayout::forceToDeactive() {
@@ -220,7 +220,7 @@ void HomeButtonLayout::forceToDeactive() {
         return;
     }
 
-    RSO::HBMStartBlackOut();
+    // Archipelago: RSO::HBMStartBlackOut();
     _25 = true;
 }
 

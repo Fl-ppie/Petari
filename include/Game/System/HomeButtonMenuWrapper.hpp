@@ -4,12 +4,12 @@
 
 class RSO {
 public:
-    static void setupRsoHomeButtonMenu();
-    static void HBMCreate(const HBMDataInfo*);
-    static void HBMInit(void);
-    static void HBMCalc(const HBMControllerData*);
-    static void HBMDraw(void);
-    static HBMSelectBtnNum HBMGetSelectBtnNum(void);
-    static void HBMSetAdjustFlag(int);
-    static void HBMStartBlackOut(void);
+    // Archipelago: static void setupRsoHomeButtonMenu();
+    // Archipelago: static void HBMCreate(const HBMDataInfo*);
+    // Archipelago: static void HBMInit(void);
+    // Archipelago: static void HBMCalc(const HBMControllerData*);
+    // Archipelago: static void HBMDraw(void);
+    // Archipelago: static HBMSelectBtnNum HBMGetSelectBtnNum(void);
+    // Archipelago: static void HBMSetAdjustFlag(int);
+    // Archipelago: static void HBMStartBlackOut(void);
 };

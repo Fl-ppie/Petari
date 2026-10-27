@@ -22,71 +22,71 @@ static RSOExportFuncTable exp_tbl[] = {{"HBMCreateRSO", (u32*)&HBMCreateRSO},
 
 typedef void (*ProloguePtr)(BOOL);
 
-void RSO::setupRsoHomeButtonMenu() {
-    u32 i;
-    RSOObjectHeader* rsoPtr;
-    RSOExportFuncTable* pTbl;
-    const RSOObjectHeader* symbolTable = reinterpret_cast< const RSOObjectHeader* >(MR::receiveFile("/ModuleData/product.sel"));
-    int jumpCodeSize;
-    void* bss;
-    void* jumps;
+// Archipelago: void RSO::setupRsoHomeButtonMenu() {
+// Archipelago:     u32 i;
+// Archipelago:     RSOObjectHeader* rsoPtr;
+// Archipelago:     RSOExportFuncTable* pTbl;
+// Archipelago:     const RSOObjectHeader* symbolTable = reinterpret_cast< const RSOObjectHeader* >(MR::receiveFile("/ModuleData/product.sel"));
+// Archipelago:     int jumpCodeSize;
+// Archipelago:     void* bss;
+// Archipelago:     void* jumps;
 
-    RSOListInit((void*)symbolTable);
-    if (symbolTable != nullptr) {
-        jumpCodeSize = RSOGetJumpCodeSize(symbolTable);
+// Archipelago:     RSOListInit((void*)symbolTable);
+// Archipelago:     if (symbolTable != nullptr) {
+// Archipelago:         jumpCodeSize = RSOGetJumpCodeSize(symbolTable);
 
-        if (jumpCodeSize == 0) {
-            jumps = nullptr;
-        } else {
-            jumps = new (MR::getStationedHeapGDDR3(), 0) char[jumpCodeSize];
-            RSOMakeJumpCode(symbolTable, jumps);
-        }
-        rsoPtr = reinterpret_cast< RSOObjectHeader* >(MR::receiveFile("/ModuleData/HomeButtonMenuWrapperRSO.rso"));
-        if (rsoPtr->mBssSize) {
-            bss = new (MR::getStationedHeapGDDR3(), 0) char[rsoPtr->mBssSize];
-        }
+// Archipelago:         if (jumpCodeSize == 0) {
+// Archipelago:             jumps = nullptr;
+// Archipelago:         } else {
+// Archipelago:             jumps = new (MR::getStationedHeapGDDR3(), 0) char[jumpCodeSize];
+// Archipelago:             RSOMakeJumpCode(symbolTable, jumps);
+// Archipelago:         }
+// Archipelago:         rsoPtr = reinterpret_cast< RSOObjectHeader* >(MR::receiveFile("/ModuleData/HomeButtonMenuWrapperRSO.rso"));
+// Archipelago:         if (rsoPtr->mBssSize) {
+// Archipelago:             bss = new (MR::getStationedHeapGDDR3(), 0) char[rsoPtr->mBssSize];
+// Archipelago:         }
 
-        RSOLinkList((void*)rsoPtr, bss);
+// Archipelago:         RSOLinkList((void*)rsoPtr, bss);
 
-        if (rsoPtr != nullptr) {
-            RSOLinkJump(rsoPtr, symbolTable, jumps);
-            reinterpret_cast< ProloguePtr >(rsoPtr->mProlog)(RSOIsImportSymbolResolvedAll(rsoPtr));
-            for (i = 0; i < ARRAY_SIZE(exp_tbl); i++) {
-                pTbl = &exp_tbl[i];
-                RSOFindExportSymbolAddr(rsoPtr, pTbl->symbol_name);
-                *(pTbl->symbol_ptr) = (u32)RSOFindExportSymbolAddr(rsoPtr, pTbl->symbol_name);
-            }
-        }
-    }
-}
+// Archipelago:         if (rsoPtr != nullptr) {
+// Archipelago:             RSOLinkJump(rsoPtr, symbolTable, jumps);
+// Archipelago:             reinterpret_cast< ProloguePtr >(rsoPtr->mProlog)(RSOIsImportSymbolResolvedAll(rsoPtr));
+// Archipelago:             for (i = 0; i < ARRAY_SIZE(exp_tbl); i++) {
+// Archipelago:                 pTbl = &exp_tbl[i];
+// Archipelago:                 RSOFindExportSymbolAddr(rsoPtr, pTbl->symbol_name);
+// Archipelago:                 *(pTbl->symbol_ptr) = (u32)RSOFindExportSymbolAddr(rsoPtr, pTbl->symbol_name);
+// Archipelago:             }
+// Archipelago:         }
+// Archipelago:     }
+// Archipelago: }
 
-void RSO::HBMCreate(const HBMDataInfo* pHBInfo) {
-    (*HBMCreateRSO)(pHBInfo);
-}
+// Archipelago: void RSO::HBMCreate(const HBMDataInfo* pHBInfo) {
+// Archipelago:     (*HBMCreateRSO)(pHBInfo);
+// Archipelago: }
 
-void RSO::HBMInit() {
-    (*HBMInitRSO)();
-}
+// Archipelago: void RSO::HBMInit() {
+// Archipelago:     (*HBMInitRSO)();
+// Archipelago: }
 
-void RSO::HBMCalc(const HBMControllerData* pController) {
-    (*HBMCalcRSO)(pController);
-}
+// Archipelago: void RSO::HBMCalc(const HBMControllerData* pController) {
+// Archipelago:     (*HBMCalcRSO)(pController);
+// Archipelago: }
 
-void RSO::HBMDraw() {
-    (*HBMDrawRSO)();
-}
+// Archipelago: void RSO::HBMDraw() {
+// Archipelago:     (*HBMDrawRSO)();
+// Archipelago: }
 
-HBMSelectBtnNum RSO::HBMGetSelectBtnNum() {
-    return (*HBMGetSelectBtnNumRSO)();
-}
+// Archipelago: HBMSelectBtnNum RSO::HBMGetSelectBtnNum() {
+// Archipelago:     return (*HBMGetSelectBtnNumRSO)();
+// Archipelago: }
 
-void RSO::HBMSetAdjustFlag(int flag) {
-    (*HBMSetAdjustFlagRSO)(flag);
-}
+// Archipelago: void RSO::HBMSetAdjustFlag(int flag) {
+// Archipelago:     (*HBMSetAdjustFlagRSO)(flag);
+// Archipelago: }
 
-void RSO::HBMStartBlackOut() {
-    (*HBMStartBlackOutRSO)();
-}
+// Archipelago: void RSO::HBMStartBlackOut() {
+// Archipelago:     (*HBMStartBlackOutRSO)();
+// Archipelago: }
 
 void _unresolved(void) {
 }
