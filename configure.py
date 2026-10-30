@@ -2538,7 +2538,7 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/System/FileLoaderThread.cpp"),
             Object(MatchingFor(ALL), "Game/System/FileRipper.cpp"),
             Object(MatchingFor(ALL), "Game/System/FunctionAsyncExecutor.cpp"),
-            Object(MatchingFor(), "Game/System/GameSystem.cpp"),
+            Object(MatchingFor(ALL), "Game/System/GameSystem.cpp"),
             Object(MatchingFor(ALL), "Game/System/GameSystemDimmingWatcher.cpp"),
             Object(MatchingFor(ALL), "Game/System/GameSystemErrorWatcher.cpp"),
             Object(MatchingFor(ALL), "Game/System/GameSystemException.cpp"),
@@ -3795,6 +3795,12 @@ config.libs = [
             ),
             Object(MatchingFor(ALL), "JSystem/JUtility/JUTDbPrint.cpp"),
         ],
+    ),
+    GameLib(
+        "Archipelago",
+        [
+            Object(MatchingFor(ALL), "Archipelago/Network.cpp"),
+        ]
     ),
 ]
 

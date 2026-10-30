@@ -223,7 +223,10 @@ Game/AreaObj/AreaFormDrawer.cpp:
 
 Game/AreaObj/AreaObj.cpp:
 	.text       start:0x8001DEB0 end:0x8001E670
-	.data       start:0x805505C0 end:0x80550648
+	.data       start:0x805505C0 end:0x80550644
+
+Archipelago/Network.cpp:
+	.data       start:0x80550644 end:0x80550648
 
 Game/AreaObj/AreaObjContainer.cpp:
 	.text       start:0x8001E670 end:0x8001EB4C
