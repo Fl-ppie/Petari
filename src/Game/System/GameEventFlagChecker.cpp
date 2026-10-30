@@ -26,8 +26,7 @@ bool GameEventFlagChecker::canOn(const char* pFlagName) const {
 
         return powerStarOpenNum <= currentPowerStarNum;
     case GameEventFlag::Type_SpecialStar:
-        return MR::hasGrandStar(pFlag->mCondition2);
-        // Archipelago: return mDataHolder->hasPowerStar(pFlag->mGalaxyName, pFlag->mStarID);
+        return mDataHolder->hasPowerStar(pFlag->mGalaxyName, pFlag->mStarID);
     case GameEventFlag::Type_EventFlag:
         const char* pRequirement1 = pFlag->mRequirement1;
         const char* pRequirement2 = pFlag->mRequirement2;
@@ -36,7 +35,8 @@ bool GameEventFlagChecker::canOn(const char* pFlagName) const {
 
         return isOnRequirement1 && isOnRequirement2;
     case GameEventFlag::Type_StoryEvent:
-        return mDataHolder->isPassedStoryEvent(pFlag->mStoryEventName);
+        return MR::hasGrandStar(pFlag->mCondition2);
+        // Archipelago: return mDataHolder->isPassedStoryEvent(pFlag->mStoryEventName);
     case GameEventFlag::Type_Galaxy:
         return isOnGalaxy(pFlagName);
     case GameEventFlag::Type_Comet:
