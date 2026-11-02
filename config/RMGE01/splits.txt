@@ -11639,6 +11639,9 @@ RVL_SDK/bte/bta_dm_cfg.c:
 	.sdata      start:0x8069E3E8 end:0x8069E400
 	.sbss2      start:0x806ADF80 end:0x806ADF88
 
+Archipelago/ArchipelagoStorage.cpp:
+	.sbss2      start:0x806ADF88 end:0x806ADF88
+
 Archipelago/NetworkWrapper.cpp:
 	.sbss2      start:0x806ADF88 end:0x806ADF88
 

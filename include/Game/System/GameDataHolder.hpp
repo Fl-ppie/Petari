@@ -12,6 +12,7 @@ class JMapInfo;
 class ScenarioProgressTestRun;
 class SpinDriverPathStorage;
 class StarPieceAlmsStorage;
+class ArchipelagoStorage;
 class UserFile;
 
 class GameDataHolder {
@@ -71,9 +72,10 @@ public:
     /* 0x0C */ GameDataAllGalaxyStorage* mAllGalaxyStorage;
     /* 0x10 */ SpinDriverPathStorage* mSpinDriverPathStorage;
     /* 0x14 */ StarPieceAlmsStorage* mStarPieceAlmsStorage;
-    /* 0x18 */ JMapInfo* mMapInfo;
-    /* 0x1C */ ScenarioProgressTestRun* mScenarioProgressTestRun;
-    /* 0x20 */ BinaryDataChunkHolder* mChunkHolder;
-    /* 0x24 */ char mName[16];
-    /* 0x34 */ const UserFile* mUserFile;
+    /* 0x18 */ ArchipelagoStorage* mArchipelagoStorage; // Archipelago
+    /* 0x1C */ JMapInfo* mMapInfo;
+    /* 0x20 */ ScenarioProgressTestRun* mScenarioProgressTestRun;
+    /* 0x24 */ BinaryDataChunkHolder* mChunkHolder;
+    /* 0x28 */ char mName[16];
+    /* 0x38 */ const UserFile* mUserFile;
 };

@@ -1,4 +1,5 @@
 #include "Game/System/GameDataHolder.hpp"
+#include "Archipelago/ArchipelagoStorage.hpp"
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameDataPlayerStatus.hpp"
 #include "Game/System/GameEventFlagChecker.hpp"
@@ -20,7 +21,7 @@ namespace {
 
 GameDataHolder::GameDataHolder(const UserFile* pUserFile)
     : mUserFile(pUserFile), mEventFlagChecker(), mEventValueChecker(), mPlayerStatus(), mAllGalaxyStorage(), mSpinDriverPathStorage(),
-      mStarPieceAlmsStorage(), mMapInfo(), mScenarioProgressTestRun(), mChunkHolder() {
+      mStarPieceAlmsStorage(), mArchipelagoStorage(), mMapInfo(), mScenarioProgressTestRun(), mChunkHolder() {
     mScenarioProgressTestRun = new ScenarioProgressTestRun(this);
     mAllGalaxyStorage = new GameDataAllGalaxyStorage();
     mEventFlagChecker = new GameEventFlagChecker(this);
@@ -29,16 +30,22 @@ GameDataHolder::GameDataHolder(const UserFile* pUserFile)
     mSpinDriverPathStorage = new SpinDriverPathStorage();
     mStarPieceAlmsStorage = new StarPieceAlmsStorage();
 
+    // Archipelago
+    mArchipelagoStorage = new ArchipelagoStorage();
+
     mMapInfo = new JMapInfo();
     mMapInfo->attach(cStoryProgressTable);
 
-    mChunkHolder = new BinaryDataChunkHolder(4096, 6);
+    mChunkHolder = new BinaryDataChunkHolder(4096, 7);
     mChunkHolder->addChunk(mPlayerStatus);
     mChunkHolder->addChunk(mEventFlagChecker->getChunk());
     mChunkHolder->addChunk(mStarPieceAlmsStorage);
     mChunkHolder->addChunk(mSpinDriverPathStorage);
     mChunkHolder->addChunk(mEventValueChecker);
     mChunkHolder->addChunk(mAllGalaxyStorage);
+
+    // Archipelago
+    mChunkHolder->addChunk(mArchipelagoStorage);
 
     resetAllData();
 
@@ -181,10 +188,14 @@ bool GameDataHolder::hasPowerStar(const char* pGalaxyName, s32 scenarioNum) cons
 }
 
 bool GameDataHolder::hasGrandStar(int index) const {
+    return index <= mArchipelagoStorage->getGrandStarCount() + 1;
+    // Archipelago
+    /*
     char name[32];
     snprintf(name, sizeof(name), "SpecialStarGrand%1d", index);
 
     return isOnGameEventFlag(name);
+    */
 }
 
 void GameDataHolder::setPowerStar(const char* pGalaxyName, s32 scenarioNum, bool set) {
@@ -196,7 +207,8 @@ s32 GameDataHolder::getPowerStarNumOwned(const char* pGalaxyName) const {
 }
 
 s32 GameDataHolder::calcCurrentPowerStarNum() const {
-    return mAllGalaxyStorage->calcCurrentPowerStarNum();
+    return mArchipelagoStorage->getPowerStarCount();
+    // Archipelago: return mAllGalaxyStorage->calcCurrentPowerStarNum();
 }
 
 GameDataSomeScenarioAccessor GameDataHolder::makeGalaxyScenarioAccessor(const char* pGalaxyName, s32 scenarioNum) {
@@ -305,6 +317,9 @@ void GameDataHolder::resetAllData() {
     mPlayerStatus->initializeData();
     mSpinDriverPathStorage->initializeData();
     mStarPieceAlmsStorage->initializeData();
+
+    // Archipelago
+    mArchipelagoStorage->initializeData();
 }
 
 u32 GameDataHolder::makeFileBinary(u8* pData, u32 a2) {
