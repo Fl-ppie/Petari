@@ -2725,7 +2725,7 @@ config.libs = [
     ),
     SDKLib("ai", [Object(MatchingFor(ALL), "RVL_SDK/ai/ai.c")]),
     SDKLib(
-        "aralt", [Object(MatchingFor(KOR), "RVL_SDK/aralt/aralt.c", cflags=cflags_sdk_aralt)]
+        "aralt", [Object(MatchingFor(KOR, USA), "RVL_SDK/aralt/aralt.c", cflags=cflags_sdk_aralt)]
     ),
     SDKLib("arc", [Object(MatchingFor(KOR), "RVL_SDK/arc/arc.c")]),
     SDKLib(
@@ -2733,7 +2733,7 @@ config.libs = [
         [
             Object(MatchingFor(KOR), "RVL_SDK/ax/AXAlloc.c"),
             Object(MatchingFor(ALL), "RVL_SDK/ax/AXAux.c"),
-            Object(MatchingFor(KOR), "RVL_SDK/ax/AXCL.c"),
+            Object(MatchingFor(ALL), "RVL_SDK/ax/AXCL.c"),
             Object(MatchingFor(ALL), "RVL_SDK/ax/AXVPB.c"),
         ],
     ),
@@ -2752,7 +2752,7 @@ config.libs = [
             Object(MatchingFor(ALL), "RVL_SDK/bte/gki_buffer.c"),
             Object(MatchingFor(ALL), "RVL_SDK/bte/gki_time.c"),
             Object(MatchingFor(ALL), "RVL_SDK/bte/gki_ppc.c"),
-            Object(MatchingFor(KOR), "RVL_SDK/bte/hcisu_h2.c"),
+            Object(MatchingFor(KOR, USA), "RVL_SDK/bte/hcisu_h2.c"),
             Object(MatchingFor(ALL), "RVL_SDK/bte/bta_dm_cfg.c"),
             Object(MatchingFor(ALL), "RVL_SDK/bte/bta_hh_cfg.c"),
             Object(MatchingFor(ALL), "RVL_SDK/bte/bta_sys_cfg.c"),
@@ -2917,8 +2917,8 @@ config.libs = [
         "nand",
         [
             Object(MatchingFor(ALL), "RVL_SDK/nand/nand.c"),
-            Object(MatchingFor(KOR), "RVL_SDK/nand/NANDOpenClose.c"),
-            Object(MatchingFor(KOR), "RVL_SDK/nand/NANDCore.c"),
+            Object(MatchingFor(KOR, USA), "RVL_SDK/nand/NANDOpenClose.c"),
+            Object(MatchingFor(KOR, USA), "RVL_SDK/nand/NANDCore.c"),
             Object(MatchingFor(ALL), "RVL_SDK/nand/NANDSecret.c"),
             Object(MatchingFor(ALL), "RVL_SDK/nand/NANDCheck.c"),
             Object(MatchingFor(ALL), "RVL_SDK/nand/NANDLogging.c"),
@@ -2960,7 +2960,7 @@ config.libs = [
     SDKLib_OS(
         "os",
         [
-            Object(MatchingFor(KOR), "RVL_SDK/os/OS.c"),
+            Object(MatchingFor(ALL), "RVL_SDK/os/OS.c"),
             Object(MatchingFor(ALL), "RVL_SDK/os/OSAlarm.c"),
             Object(MatchingFor(ALL), "RVL_SDK/os/OSAlloc.c"),
             Object(MatchingFor(ALL), "RVL_SDK/os/OSArena.c"),
@@ -2981,7 +2981,7 @@ config.libs = [
             Object(MatchingFor(ALL), "RVL_SDK/os/OSMemory.c"),
             Object(MatchingFor(ALL), "RVL_SDK/os/OSMutex.c"),
             Object(MatchingFor(ALL), "RVL_SDK/os/OSReboot.c"),
-            Object(MatchingFor(KOR), "RVL_SDK/os/OSReset.c"),
+            Object(MatchingFor(ALL), "RVL_SDK/os/OSReset.c"),
             Object(MatchingFor(ALL), "RVL_SDK/os/OSRtc.c"),
             Object(MatchingFor(ALL), "RVL_SDK/os/OSSync.c"),
             Object(MatchingFor(KOR), "RVL_SDK/os/OSThread.c"),
@@ -3099,7 +3099,7 @@ config.libs = [
     SDKLib(
         "wpad",
         [
-            Object(MatchingFor(KOR,PAL), "RVL_SDK/wpad/WPAD.c", cflags=cflags_sdk_wpad),
+            Object(MatchingFor(KOR, PAL), "RVL_SDK/wpad/WPAD.c", cflags=cflags_sdk_wpad),
             Object(MatchingFor(ALL), "RVL_SDK/wpad/WPADHIDParser.c"),
             Object(MatchingFor(ALL), "RVL_SDK/wpad/WPADEncrypt.c"),
             Object(MatchingFor(ALL), "RVL_SDK/wpad/WPADMem.c"),
