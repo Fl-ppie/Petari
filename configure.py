@@ -3800,6 +3800,7 @@ config.libs = [
         "Archipelago",
         [
             Object(MatchingFor(ALL), "Archipelago/NetworkWrapper.cpp"),
+            Object(MatchingFor(ALL), "Archipelago/NetworkHandler.cpp"),
         ]
     ),
 ]
