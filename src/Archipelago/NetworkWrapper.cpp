@@ -1,11 +1,12 @@
-#include "Archipelago/Network.hpp"
+#include "Archipelago/NetworkWrapper.hpp"
+#include "revolution/ipc/ipcclt.h"
 #include <revolution/os.h>
 #include <cstring>
 
-Network::Network() : mDeviceFd(-1), mSocketFd(-1), mAddress() {
+NetworkWrapper::NetworkWrapper() : mDeviceFd(-1), mSocketFd(-1), mAddress() {
 }
 
-void Network::init() {
+void NetworkWrapper::init() {
     mDeviceFd = open();
 
     if (mDeviceFd >= 0) {
@@ -13,11 +14,11 @@ void Network::init() {
     }
 }
 
-IOSError Network::open(u32 flags) {
+IOSError NetworkWrapper::open(u32 flags) {
     return IOS_Open(IOS_PATH, flags);
 }
 
-IOSError Network::socket(Family family, Type type, Protocol protocol) {
+IOSError NetworkWrapper::socket(Family family, Type type, Protocol protocol) {
     if (mDeviceFd < 0) {
         return IOS_ERROR_NOEXISTS;
     }
@@ -43,7 +44,7 @@ IOSError Network::socket(Family family, Type type, Protocol protocol) {
     return error;
 }
 
-IOSError Network::setNonBlocking(bool isNonBlocking) {
+IOSError NetworkWrapper::setNonBlocking(bool isNonBlocking) {
     if (mDeviceFd < 0) {
         return IOS_ERROR_NOEXISTS;
     }
@@ -64,7 +65,7 @@ IOSError Network::setNonBlocking(bool isNonBlocking) {
     return IOS_Ioctl(mDeviceFd, IOCTL_FCNTL, &params, sizeof(params), nullptr, 0);
 }
 
-IOSError Network::connect() {
+IOSError NetworkWrapper::connect() {
     if (mDeviceFd < 0) {
         return IOS_ERROR_NOEXISTS;
     }
@@ -86,7 +87,41 @@ IOSError Network::connect() {
     return IOS_Ioctl(mDeviceFd, IOCTL_CONNECT, &params, sizeof(params), nullptr, 0);
 }
 
-IOSError Network::send(const void* pData, s32 size, u32 flags) {
+IOSError NetworkWrapper::poll() {
+    if (mDeviceFd < 0) {
+        return IOS_ERROR_NOEXISTS;
+    }
+
+    if (mSocketFd < 0) {
+        return IOS_ERROR_NOEXISTS;
+    }
+
+    struct {
+        u64 timeout;
+    } params ATTRIBUTE_ALIGN(32);
+
+    params.timeout = 0;
+
+    struct {
+        IOSFd fd;
+        u32 events;
+        u32 revents;
+    } pollparams ATTRIBUTE_ALIGN(32);
+
+    pollparams.fd = mSocketFd;
+    pollparams.events = POLL_IN | POLL_OUT | POLL_ERR | POLL_HUP;
+    pollparams.revents = 0;
+
+    IOSError error = IOS_Ioctl(mDeviceFd, IOCTL_POLL, &params, sizeof(params), &pollparams, sizeof(pollparams));
+
+    if (error < 0 ) {
+        return error;
+    }
+
+    return pollparams.revents;
+}
+
+IOSError NetworkWrapper::send(const void* pData, s32 size, u32 flags) {
     if (mDeviceFd < 0) {
         return IOS_ERROR_NOEXISTS;
     }
@@ -122,7 +157,7 @@ IOSError Network::send(const void* pData, s32 size, u32 flags) {
     return error;
 }
 
-IOSError Network::recv(void* pDst, s32 size, u32 flags) {
+IOSError NetworkWrapper::recv(void* pDst, s32 size, u32 flags) {
     if (mDeviceFd < 0) {
         return IOS_ERROR_NOEXISTS;
     }
@@ -148,7 +183,7 @@ IOSError Network::recv(void* pDst, s32 size, u32 flags) {
     return IOS_Ioctlv(mDeviceFd, IOCTL_RECV, 1, 1, vectors);
 }
 
-IOSError Network::close() {
+IOSError NetworkWrapper::close() {
     if (mDeviceFd < 0) {
         return IOS_ERROR_NOEXISTS;
     }
@@ -180,6 +215,6 @@ IOSError Network::close() {
     return error;
 }
 
-Network::~Network() {
+NetworkWrapper::~NetworkWrapper() {
     close();
 }

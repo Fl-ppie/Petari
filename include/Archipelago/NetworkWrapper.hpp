@@ -41,14 +41,11 @@ enum IoctlCmd {
     IOCTL_GET_HOST_BY_NAME = 0x11,
 };
 
-enum MsgFlag {
-    MSG_NULL = 0x0,
-    MSG_OOB = 0x1,
-    MSG_PEEK = 0x2,
-    MSG_DONTROUTE = 0x4,
-    MSG_CTRUNC = 0x8,
-    MSG_TRUNC = 0x20,
-    MSG_WAITALL = 0x100,
+enum PollState {
+    POLL_IN = 0x1,
+    POLL_OUT = 0x4,
+    POLL_ERR = 0x8,
+    POLL_HUP = 0x10,
 };
 
 struct SocketAddress {
@@ -74,17 +71,18 @@ struct SocketAddress {
     };
 };
 
-class Network {
+class NetworkWrapper {
 public:
-    Network();
+    NetworkWrapper();
 
-    virtual ~Network();
-
-    void init();
+    virtual ~NetworkWrapper();
+    virtual void init();
+    
     IOSError open(u32 flags = 0);
     IOSError socket(Family family, Type type, Protocol protocol = IPPROTO_IP);
     IOSError setNonBlocking(bool isNonBlocking);
     IOSError connect();
+    IOSError poll();
     IOSError send(const void* pData, s32 size, u32 flags = 0);
     IOSError recv(void* pDst, s32 size, u32 flags = 0);
     IOSError close();

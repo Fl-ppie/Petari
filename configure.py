@@ -3799,7 +3799,7 @@ config.libs = [
     GameLib(
         "Archipelago",
         [
-            Object(MatchingFor(ALL), "Archipelago/Network.cpp"),
+            Object(MatchingFor(ALL), "Archipelago/NetworkWrapper.cpp"),
         ]
     ),
 ]
