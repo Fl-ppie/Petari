@@ -21,8 +21,12 @@ public:
     u32 getGreenStarCount();
     void addGreenStarCount();
     void setGreenStarCount(u32);
+    u32 getLastRecvIndex();
+    void addLastRecvIndex();
+    void setLastRecvIndex(u32);
 
-    /* 0x4 */ u32 mPowerStarCount;
-    /* 0x8 */ u32 mGrandStarCount;
-    /* 0xC */ u32 mGreenStarCount;
+    /* 0x04 */ u32 mPowerStarCount;
+    /* 0x08 */ u32 mGrandStarCount;
+    /* 0x0C */ u32 mGreenStarCount;
+    /* 0x10 */ u32 mLastRecvIndex;
 };

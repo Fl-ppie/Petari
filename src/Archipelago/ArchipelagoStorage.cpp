@@ -19,6 +19,7 @@ s32 ArchipelagoStorage::serialize(u8* pBuffer, u32 size) const {
     stream.write(&mPowerStarCount, sizeof(mPowerStarCount));
     stream.write(&mGrandStarCount, sizeof(mGrandStarCount));
     stream.write(&mGreenStarCount, sizeof(mGreenStarCount));
+    stream.write(&mLastRecvIndex, sizeof(mLastRecvIndex));
 
     return stream.mPosition;
 }
@@ -31,6 +32,7 @@ s32 ArchipelagoStorage::deserialize(const u8* pBuffer, u32 size) {
     stream.read(&mPowerStarCount, sizeof(mPowerStarCount));
     stream.read(&mGrandStarCount, sizeof(mGrandStarCount));
     stream.read(&mGreenStarCount, sizeof(mGreenStarCount));
+    stream.read(&mLastRecvIndex, sizeof(mLastRecvIndex));
 
     return 0;
 }
@@ -39,6 +41,7 @@ void ArchipelagoStorage::initializeData() {
     mPowerStarCount = 0;
     mGrandStarCount = 0;
     mGreenStarCount = 0;
+    mLastRecvIndex = 0;
 }
 
 u32 ArchipelagoStorage::getPowerStarCount() {
@@ -75,4 +78,16 @@ void ArchipelagoStorage::addGreenStarCount() {
 
 void ArchipelagoStorage::setGreenStarCount(u32 num) {
     mGreenStarCount = num;
+}
+
+u32 ArchipelagoStorage::getLastRecvIndex() {
+    return mLastRecvIndex;
+}
+
+void ArchipelagoStorage::addLastRecvIndex() {
+    mLastRecvIndex++;
+}
+
+void ArchipelagoStorage::setLastRecvIndex(u32 num) {
+    mLastRecvIndex = num;
 }
