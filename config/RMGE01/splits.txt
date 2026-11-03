@@ -11642,6 +11642,9 @@ RVL_SDK/bte/bta_dm_cfg.c:
 Archipelago/ArchipelagoStorage.cpp:
 	.sbss2      start:0x806ADF88 end:0x806ADF88
 
+Archipelago/Deathlink.cpp:
+	.sbss2      start:0x806ADF88 end:0x806ADF88
+
 Archipelago/NetworkWrapper.cpp:
 	.sbss2      start:0x806ADF88 end:0x806ADF88
 
