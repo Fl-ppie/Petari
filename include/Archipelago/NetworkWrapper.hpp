@@ -76,8 +76,8 @@ public:
     NetworkWrapper();
 
     virtual ~NetworkWrapper();
-    virtual void init();
     
+    void init();
     IOSError open(u32 flags = 0);
     IOSError socket(Family family, Type type, Protocol protocol = IPPROTO_IP);
     IOSError setNonBlocking(bool isNonBlocking);
