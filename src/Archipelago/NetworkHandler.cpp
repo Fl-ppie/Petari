@@ -1,8 +1,8 @@
 #include "Archipelago/NetworkHandler.hpp"
-#include "Archipelago/NetworkWrapper.hpp"
-#include <revolution/os.h>
+#include "Archipelago/Deathlink.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 
-NetworkHandler::NetworkHandler() : mWrapper() {
+NetworkHandler::NetworkHandler() : mWrapper(), mSendQueue() {
 }
 
 void NetworkHandler::init(Family family, u32 port, u8 ipv41, u8 ipv42, u8 ipv43, u8 ipv44) {
@@ -30,11 +30,14 @@ void NetworkHandler::update() {
 
 void NetworkHandler::recvPacket(APPacket* pPacket) {
     switch (pPacket->mType) {
-        case PacketType_PowerStar:
+    case PacketType_PowerStar:
         break;
-        case PacketType_GrandStar:
+    case PacketType_GrandStar:
         break;
-        case PacketType_GreenStar:
+    case PacketType_GreenStar:
+        break;
+    case PacketType_Deathlink:
+        SingletonHolder< Deathlink >::get()->recvDeath();
         break;
     }
 }

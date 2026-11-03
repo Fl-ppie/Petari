@@ -9,6 +9,7 @@ enum PacketType {
     PacketType_PowerStar = 0x1,
     PacketType_GrandStar = 0x2,
     PacketType_GreenStar = 0x3,
+    PacketType_Deathlink = 0x4,
 };
 
 struct APPacket {
