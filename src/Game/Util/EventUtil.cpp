@@ -1,3 +1,4 @@
+#include "Archipelago/ArchipelagoStorage.hpp"
 #include "Game/Map/RaceManager.hpp"
 #include "Game/NPC/EventDirector.hpp"
 #include "Game/Scene/SceneObjHolder.hpp"
@@ -14,6 +15,7 @@
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Util/PlayerUtil.hpp"
 #include "Game/Util/SceneUtil.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/StringUtil.hpp"
 #include <cstdio>
 
@@ -971,7 +973,8 @@ namespace MR {
     }
 
     bool isOnGameEventFlagGreenDriver() {
-        return GameDataFunction::isOnGameEventFlag("SpecialStarGreenAll");
+        return GameDataFunction::getArchipelagoStorage()->getGreenStarCount() > 0;
+        // Archipelago: return GameDataFunction::isOnGameEventFlag("SpecialStarGreenAll");
     }
 
     bool isOnGameEventFlagRedDriver() {

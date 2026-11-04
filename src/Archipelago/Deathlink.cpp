@@ -41,7 +41,7 @@ void Deathlink::update() {
         mDeathTimer--;
     }
 
-    if (mDeathTimer == 0 && mDeathBuffer == 0 && ::canPause() && MR::isExistMario() && MarioAccess::isConfrontDeath()) {
+    if (mDeathTimer == 0 && mDeathBuffer == 0 && ::canPause() && MR::isExistMario() && MR::isPlayerConfrontDeath()) {
         sendDeath();
     }
 }

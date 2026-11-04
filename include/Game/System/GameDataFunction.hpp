@@ -5,6 +5,7 @@
 class GameDataHolder;
 class GameDataSomeScenarioAccessor;
 class JMapInfoIter;
+class ArchipelagoStorage;
 
 namespace GameDataFunction {
     bool isDataMario();
@@ -83,4 +84,6 @@ namespace GameDataFunction {
     void addStockedStarPiece(int);
     bool isPowerStarLeftInCometOnly();
     s32 calcGreenStarNum(const GameDataHolder*);
+
+    ArchipelagoStorage* getArchipelagoStorage();
 };  // namespace GameDataFunction

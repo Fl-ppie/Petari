@@ -1,4 +1,5 @@
 #include "Game/System/GameDataFunction.hpp"
+#include "Archipelago/ArchipelagoStorage.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameDataHolder.hpp"
@@ -442,5 +443,9 @@ namespace GameDataFunction {
         }
 
         return greenStarNum;
+    }
+
+    ArchipelagoStorage* getArchipelagoStorage() {
+        return getCurrentGameDataHolder()->mArchipelagoStorage;
     }
 };  // namespace GameDataFunction

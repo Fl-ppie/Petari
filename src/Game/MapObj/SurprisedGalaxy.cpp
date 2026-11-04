@@ -11,6 +11,7 @@
 #include "Game/Util/ScreenUtil.hpp"
 #include "Game/Util/SequenceUtil.hpp"
 #include "Game/Util/SoundUtil.hpp"
+#include "Game/Util/StringUtil.hpp"
 
 namespace NrvSurprisedGalaxy {
     NEW_NERVE(SurprisedGalaxyNrvExit, SurprisedGalaxy, Exit);
@@ -49,6 +50,17 @@ void SurprisedGalaxy::init(const JMapInfoIter& rIter) {
     } else {
         makeActorAppeared();
 
+        // Archipelago
+        if (MR::isEqualString(mGalaxyName, "PeachCastleFinalGalaxy")) {
+            if (!MR::isOnGameEventFlagViewCompleteEndingMarioAndLuigi()) {
+                makeActorDead();
+            }
+        } else if (!MR::isOnGameEventFlagGreenDriver()) {
+            makeActorDead();
+        }
+
+        // Archipelago:
+        /*
         if (MR::isGalaxyAppearGreenDriver(mGalaxyName)) {
             if (!MR::isOnGameEventFlagGreenDriver()) {
                 makeActorDead();
@@ -56,6 +68,7 @@ void SurprisedGalaxy::init(const JMapInfoIter& rIter) {
         } else if (!MR::isOnGameEventFlagViewCompleteEndingMarioAndLuigi()) {
             makeActorDead();
         }
+        */
     }
 }
 

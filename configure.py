@@ -2606,7 +2606,7 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/System/GalaxyNameSortTable.cpp"),
             Object(MatchingFor(ALL), "Game/System/GalaxyStatusAccessor.cpp"),
             Object(MatchingFor(ALL), "Game/System/GameDataConst.cpp"),
-            Object(MatchingFor(), "Game/System/GameDataFunction.cpp"),
+            Object(MatchingFor(ALL), "Game/System/GameDataFunction.cpp"),
             Object(MatchingFor(), "Game/System/GameDataGalaxyStorage.cpp"),
             Object(MatchingFor(ALL), "Game/System/GameDataHolder.cpp"),
             Object(MatchingFor(ALL), "Game/System/GameDataPlayerStatus.cpp"),
@@ -2650,7 +2650,7 @@ config.libs = [
             Object(MatchingFor(), "Game/Util/DemoUtil.cpp"),
             Object(MatchingFor(), "Game/Util/DrawUtil.cpp"),
             Object(MatchingFor(ALL), "Game/Util/EffectUtil.cpp"),
-            Object(MatchingFor(KOR), "Game/Util/EventUtil.cpp"),
+            Object(MatchingFor(ALL), "Game/Util/EventUtil.cpp"),
             Object(
                 MatchingFor(JPN, KOR), "Game/Util/FileUtil.cpp", cflags=[*cflags_game, "-sym off"]
             ),
