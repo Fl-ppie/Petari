@@ -11651,6 +11651,9 @@ Archipelago/NetworkWrapper.cpp:
 Archipelago/NetworkHandler.cpp:
 	.sbss2      start:0x806ADF88 end:0x806ADF88
 
+Archipelago/PatchHandler.cpp:
+	.sbss2      start:0x806ADF88 end:0x806ADF88
+
 RVL_SDK/bte/bta_hh_cfg.c:
 	.rodata     start:0x8054D820 end:0x8054D830
 	.sdata      start:0x8069E400 end:0x8069E410

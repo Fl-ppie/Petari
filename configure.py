@@ -3803,6 +3803,7 @@ config.libs = [
             Object(MatchingFor(ALL), "Archipelago/Deathlink.cpp"),
             Object(MatchingFor(ALL), "Archipelago/NetworkWrapper.cpp"),
             Object(MatchingFor(ALL), "Archipelago/NetworkHandler.cpp"),
+            Object(MatchingFor(ALL), "Archipelago/PatchHandler.cpp"),
         ]
     ),
 ]
