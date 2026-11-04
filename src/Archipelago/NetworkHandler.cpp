@@ -1,5 +1,7 @@
 #include "Archipelago/NetworkHandler.hpp"
+#include "Archipelago/ArchipelagoStorage.hpp"
 #include "Archipelago/Deathlink.hpp"
+#include "Game/System/GameDataFunction.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 
 NetworkHandler::NetworkHandler() : mWrapper(), mSendQueue() {
@@ -31,14 +33,19 @@ void NetworkHandler::update() {
 void NetworkHandler::recvPacket(APPacket* pPacket) {
     switch (pPacket->mType) {
     case PacketType_PowerStar:
+        GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
         break;
     case PacketType_GrandStar:
+        GameDataFunction::getArchipelagoStorage()->addGrandStarCount();
         break;
     case PacketType_GreenStar:
+        GameDataFunction::getArchipelagoStorage()->addGreenStarCount();
         break;
     case PacketType_Deathlink:
         SingletonHolder< Deathlink >::get()->recvDeath();
         break;
+    case PacketType_Lives:
+        GameDataFunction::addPlayerLeft(1);
     }
 }
 
