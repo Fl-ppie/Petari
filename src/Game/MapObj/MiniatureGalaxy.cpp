@@ -253,7 +253,7 @@ void MiniatureGalaxy::makeArchiveList(NameObjArchiveListCollector* pCollector, c
         }
 
         pCollector->addArchive(isUnknownKoopa ? "MiniKoopaGalaxy" : objectName);
-        // pCollector->addArchive(::isUseKoopaFaceModel(objectName, ::getGalayNameFromObjectName(objectName)) ? "MiniKoopaGalaxy" : objectName);
+        // Archipelago: pCollector->addArchive(::isUseKoopaFaceModel(objectName, ::getGalayNameFromObjectName(objectName)) ? "MiniKoopaGalaxy" : objectName);
         pCollector->addArchive("MiniatureGalaxyUnknownKoopa");
     }
 

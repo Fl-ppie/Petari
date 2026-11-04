@@ -30,7 +30,7 @@ public:
 
     virtual ~NetworkHandler();
     
-    void init(Family family, u32 port, u8 ipv41, u8 ipv42, u8 ipv43, u8 ipv44);
+    void init(u8 ipv41, u8 ipv42, u8 ipv43, u8 ipv44, u32 port);
     void update();
     void recvPacket(APPacket*);
     void sendPacket(const APPacket&);

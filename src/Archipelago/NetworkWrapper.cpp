@@ -1,6 +1,5 @@
 #include "Archipelago/NetworkWrapper.hpp"
-#include "revolution/ipc/ipcclt.h"
-#include <revolution/os.h>
+#include <revolution/ipc/ipcclt.h>
 #include <cstring>
 
 NetworkWrapper::NetworkWrapper() : mDeviceFd(-1), mSocketFd(-1), mAddress() {
@@ -71,6 +70,10 @@ IOSError NetworkWrapper::connect() {
     }
 
     if (mSocketFd < 0) {
+        return IOS_ERROR_NOEXISTS;
+    }
+
+    if (mAddress == nullptr) {
         return IOS_ERROR_NOEXISTS;
     }
 

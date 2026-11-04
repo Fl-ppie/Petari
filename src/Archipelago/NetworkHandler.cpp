@@ -7,16 +7,20 @@
 NetworkHandler::NetworkHandler() : mWrapper(), mSendQueue() {
 }
 
-void NetworkHandler::init(Family family, u32 port, u8 ipv41, u8 ipv42, u8 ipv43, u8 ipv44) {
+void NetworkHandler::init(u8 ipv41, u8 ipv42, u8 ipv43, u8 ipv44, u32 port) {
     mWrapper = new NetworkWrapper();
     mWrapper->init();
     mWrapper->setNonBlocking(true);
 
-    mWrapper->mAddress = new SocketAddress(family, port, ipv41, ipv42, ipv43, ipv44);
+    mWrapper->mAddress = new SocketAddress(AF_INET, port, ipv41, ipv42, ipv43, ipv44);
     mWrapper->connect();
 }
 
 void NetworkHandler::update() {
+    if (mWrapper == nullptr) {
+        return;
+    }
+
     APPacket packets[PACKET_BUFFER];
     mWrapper->recv(&packets, sizeof(packets));
 
