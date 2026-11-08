@@ -19,14 +19,12 @@ enum StarType {
     /* 0x2 */ StarType_GreenStar,
 };
 
-class APPacket {
-public:
-    APPacket();
+struct APPacket {
+    APPacket(u16 size, PacketType type) : mSize(size), mType(type) {
+    }
 
-    virtual ~APPacket();
-
-    /* 0x4 */ u16 mSize;
-    /* 0x8 */ PacketType mType;
+    /* 0x0 */ u16 mSize;
+    /* 0x4 */ PacketType mType;
 };
 
 class NetworkHandler {
@@ -59,35 +57,27 @@ public:
     /* 0xC */ MR::Vector< MR::AssignableArray< APPacket* > > mSendQueue;
 };
 
-class SyncPacket : public APPacket {
-public:
-    SyncPacket();
-
-    virtual ~SyncPacket();
+struct SyncPacket : public APPacket {
+    SyncPacket() : APPacket(sizeof(SyncPacket), PacketType_Sync) {
+    }
 };
 
-class StarPacket : public APPacket {
-public:
-    StarPacket(StarType starType, u8 galaxyNo, u8 scenarioNo) : mStarType(starType), mGalaxyNo(galaxyNo), mScenarioNo(scenarioNo) {
+struct StarPacket : public APPacket {
+    StarPacket(StarType starType, u8 galaxyNo, u8 scenarioNo)
+        : APPacket(sizeof(StarPacket), PacketType_Star), mStarType(starType), mGalaxyNo(galaxyNo), mScenarioNo(scenarioNo) {
     }
 
-    virtual ~StarPacket();
-
-    /* 0x0C */ StarType mStarType;
-    /* 0x10 */ u8 mGalaxyNo;
-    /* 0x11 */ u8 mScenarioNo;
+    /* 0x8 */ StarType mStarType;
+    /* 0xC */ u8 mGalaxyNo;
+    /* 0xD */ u8 mScenarioNo;
 };
 
-class DeathPacket : public APPacket {
-public:
-    DeathPacket();
-
-    virtual ~DeathPacket();
+struct DeathPacket : public APPacket {
+    DeathPacket() : APPacket(sizeof(DeathPacket), PacketType_Deathlink) {
+    }
 };
 
-class LivesPacket : public APPacket {
-public:
-    LivesPacket();
-
-    virtual ~LivesPacket();
+struct LivesPacket : public APPacket {
+    LivesPacket() : APPacket(sizeof(LivesPacket), PacketType_Lives) {
+    }
 };
