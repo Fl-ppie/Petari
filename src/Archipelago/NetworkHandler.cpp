@@ -30,40 +30,58 @@ void NetworkHandler::update() {
         return;
     }
 
-    APPacket packets[PACKET_BUFFER];
-    mWrapper->recv(&packets, sizeof(packets));
+    u8 recvbuf[512];
+    mWrapper->recv(&recvbuf, sizeof(APPacket));
 
-    for (APPacket* packet = packets; packet->mType != PacketType_NULL; packet++) {
+    APPacket* packet = reinterpret_cast< APPacket* >(&recvbuf);
+    if (packet->mType != PacketType_NULL) {
+        mWrapper->recv(packet + 1, packet->mSize - sizeof(APPacket));
         recvPacket(packet);
     }
 
     if (mSendQueue.size() != 0) {
-        mWrapper->send(&mSendQueue, mSendQueue.size() * sizeof(*mSendQueue.begin()));
+        for (APPacket* packet = *mSendQueue.begin(); packet != *mSendQueue.end(); packet++) {
+            mWrapper->send(packet, packet->mSize);
+            delete packet;
+        }
+
         mSendQueue.clear();
     }
 }
 
 void NetworkHandler::recvPacket(APPacket* pPacket) {
     switch (pPacket->mType) {
-    case PacketType_PowerStar:
-        GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
-        break;
-    case PacketType_GrandStar:
-        GameDataFunction::getArchipelagoStorage()->addGrandStarCount();
-        break;
-    case PacketType_GreenStar:
-        GameDataFunction::getArchipelagoStorage()->addGreenStarCount();
+    case PacketType_Star:
+        switch (static_cast< StarPacket* >(pPacket)->mStarType) {
+        case StarType_PowerStar:
+            GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
+
+            break;
+        case StarType_GrandStar:
+            GameDataFunction::getArchipelagoStorage()->addGrandStarCount();
+
+            break;
+        case StarType_GreenStar:
+            GameDataFunction::getArchipelagoStorage()->addGreenStarCount();
+
+            break;
+        }
         break;
     case PacketType_Deathlink:
         SingletonHolder< Deathlink >::get()->recvDeath();
+
         break;
     case PacketType_Lives:
         GameDataFunction::addPlayerLeft(1);
+
+        break;
+    default:
+        break;
     }
 }
 
-void NetworkHandler::sendPacket(const APPacket& rPacket) {
-    mSendQueue.push_back(rPacket);
+void NetworkHandler::sendPacket(APPacket* pPacket) {
+    mSendQueue.push_back(pPacket);
 }
 
 NetworkHandler::~NetworkHandler() {
