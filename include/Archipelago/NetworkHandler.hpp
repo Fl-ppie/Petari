@@ -68,11 +68,14 @@ public:
 
 class StarPacket : public APPacket {
 public:
-    StarPacket();
+    StarPacket(StarType starType, u8 galaxyNo, u8 scenarioNo) : mStarType(starType), mGalaxyNo(galaxyNo), mScenarioNo(scenarioNo) {
+    }
 
     virtual ~StarPacket();
 
-    /* 0x8 */ StarType mStarType;
+    /* 0x0C */ StarType mStarType;
+    /* 0x10 */ u8 mGalaxyNo;
+    /* 0x11 */ u8 mScenarioNo;
 };
 
 class DeathPacket : public APPacket {

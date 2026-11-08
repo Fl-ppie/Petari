@@ -55,25 +55,20 @@ void NetworkHandler::recvPacket(APPacket* pPacket) {
         switch (static_cast< StarPacket* >(pPacket)->mStarType) {
         case StarType_PowerStar:
             GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
-
             break;
         case StarType_GrandStar:
             GameDataFunction::getArchipelagoStorage()->addGrandStarCount();
-
             break;
         case StarType_GreenStar:
             GameDataFunction::getArchipelagoStorage()->addGreenStarCount();
-
             break;
         }
         break;
     case PacketType_Deathlink:
         SingletonHolder< Deathlink >::get()->recvDeath();
-
         break;
     case PacketType_Lives:
         GameDataFunction::addPlayerLeft(1);
-
         break;
     default:
         break;

@@ -1,5 +1,6 @@
 #include "Game/System/GameDataHolder.hpp"
 #include "Archipelago/ArchipelagoStorage.hpp"
+#include "Archipelago/NetworkHandler.hpp"
 #include "Game/System/GameDataGalaxyStorage.hpp"
 #include "Game/System/GameDataPlayerStatus.hpp"
 #include "Game/System/GameEventFlagChecker.hpp"
@@ -13,6 +14,7 @@
 #include "Game/System/UserFile.hpp"
 #include "Game/Util/JMapInfo.hpp"
 #include "Game/Util/MathUtil.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 #include <cstdio>
 
 namespace {
@@ -199,6 +201,12 @@ bool GameDataHolder::hasGrandStar(int index) const {
 }
 
 void GameDataHolder::setPowerStar(const char* pGalaxyName, s32 scenarioNum, bool set) {
+    if (set == true) {
+        u8 galaxyIndex = mAllGalaxyStorage->findIndex(pGalaxyName);
+        StarPacket* packet = new StarPacket(StarType_PowerStar, galaxyIndex, scenarioNum);
+        SingletonHolder< NetworkHandler >::get()->sendPacket(packet);
+    }
+
     makeGalaxyScenarioAccessor(pGalaxyName, scenarioNum).setPowerStarFlag(set);
 }
 
