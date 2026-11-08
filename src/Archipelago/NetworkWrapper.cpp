@@ -1,5 +1,4 @@
 #include "Archipelago/NetworkWrapper.hpp"
-#include <revolution/ipc/ipcclt.h>
 #include <cstring>
 
 NetworkWrapper::NetworkWrapper() : mDeviceFd(-1), mSocketFd(-1), mAddress() {
@@ -117,7 +116,7 @@ IOSError NetworkWrapper::poll() {
 
     IOSError error = IOS_Ioctl(mDeviceFd, IOCTL_POLL, &params, sizeof(params), &pollparams, sizeof(pollparams));
 
-    if (error < 0 ) {
+    if (error < 0) {
         return error;
     }
 

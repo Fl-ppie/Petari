@@ -4,8 +4,10 @@
 #include "Game/Util/Array.hpp"
 
 #define PACKET_BUFFER 32
+#define RECONNECT_TIMEOUT 60 * 5
 
 enum PacketType {
+    PacketType_NULL = 0x0,
     PacketType_PowerStar = 0x1,
     PacketType_GrandStar = 0x2,
     PacketType_GreenStar = 0x3,
@@ -35,6 +37,21 @@ public:
     void recvPacket(APPacket*);
     void sendPacket(const APPacket&);
 
-    /* 0x4 */ NetworkWrapper* mWrapper;
-    /* 0x8 */ MR::Vector< MR::FixedArray<APPacket, PACKET_BUFFER> > mSendQueue;
+    IOSError reconnect() {
+        if (mWrapper == nullptr) {
+            return IOS_ERROR_NOEXISTS;
+        }
+
+        if (--mReconnectTimer != 0) {
+            return IOS_ERROR_NOTREADY;
+        }
+
+        mReconnectTimer = RECONNECT_TIMEOUT;
+
+        return mWrapper->connect();
+    }
+
+    /* 0x4 */ u32 mReconnectTimer;
+    /* 0x8 */ NetworkWrapper* mWrapper;
+    /* 0xC */ MR::Vector< MR::FixedArray<APPacket, PACKET_BUFFER> > mSendQueue;
 };

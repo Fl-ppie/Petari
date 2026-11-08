@@ -4,7 +4,7 @@
 #include "Game/System/GameDataFunction.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 
-NetworkHandler::NetworkHandler() : mWrapper(), mSendQueue() {
+NetworkHandler::NetworkHandler() : mReconnectTimer(RECONNECT_TIMEOUT), mWrapper(), mSendQueue() {
 }
 
 void NetworkHandler::init(u8 ipv41, u8 ipv42, u8 ipv43, u8 ipv44, u32 port) {
@@ -21,10 +21,19 @@ void NetworkHandler::update() {
         return;
     }
 
+    IOSError poll = mWrapper->poll();
+
+    if (poll < 0) {
+        return;
+    } else if (poll != POLL_ERR) {
+        reconnect();
+        return;
+    }
+
     APPacket packets[PACKET_BUFFER];
     mWrapper->recv(&packets, sizeof(packets));
 
-    for (APPacket* packet = packets; packet->mType != 0; packet++) {
+    for (APPacket* packet = packets; packet->mType != PacketType_NULL; packet++) {
         recvPacket(packet);
     }
 
