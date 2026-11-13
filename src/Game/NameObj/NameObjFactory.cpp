@@ -5814,8 +5814,225 @@ namespace {
             createNameObj< MiniatureGalaxy >,
             nullptr,
         },
+        // Archipelago
+        {
+            "MiniHeavensDoorGalaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniBeltConveyerExGalaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniCocoonExGalaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniTearDropGalaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniTeresaMario2DGalaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniSnowCapsuleGalaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniTransformationExGalaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniFishTunnelGalaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniTamakoroExLv2Galaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniSurfingLv2Galaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniCubeBubbleExLv2Galaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
+        {
+            "MiniPeachCastleFinalGalaxy",
+            createNameObj< MiniatureGalaxy >,
+            nullptr,
+        },
         {
             "SurprisedGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        // Archipelago
+        {
+            "SurpEggStarGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpHoneyBeeKingdomGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpFlipPanelExGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpSurfingLv1Galaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpTriLegLv1Galaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpStarDustGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpTamakoroExLv1Galaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpBattleShipGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpBreakDownPlanetGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpKoopaBattleVs1Galaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpHeavenlyBeachGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpCubeBubbleExLv1Galaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpPhantomGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpOceanFloaterLandGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpKoopaJrShipLv1Galaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpCosmosGardenGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpIceVolcanoGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpHoneyBeeExGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpSandClockGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpKoopaBattleVs2Galaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpReverseKingdomGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpOceanRingGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpFactoryGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpSkullSharkGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpFloaterOtaKingGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpOceanPhantomCaveGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpCannonFleetGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpDarkRoomGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpHellProminenceGalaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpKoopaBattleVs3Galaxy",
+            createNameObj< SurprisedGalaxy >,
+            "MiniSurprisedGalaxy",
+        },
+        {
+            "SurpHeavensDoorGalaxy",
             createNameObj< SurprisedGalaxy >,
             "MiniSurprisedGalaxy",
         },
@@ -8059,6 +8276,55 @@ namespace {
         },
         {
             "MiniKoopaBattleVs3Galaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        // Archipelago
+        {
+            "MiniBeltConveyerExGalaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniCocoonExGalaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniTearDropGalaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniTeresaMario2DGalaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniSnowCapsuleGalaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniTransformationExGalaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniFishTunnelGalaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniTamakoroExLv2Galaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniSurfingLv2Galaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniCubeBubbleExLv2Galaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniPeachCastleFinalGalaxy",
+            MiniatureGalaxy::makeArchiveList,
+        },
+        {
+            "MiniHeavensDoorGalaxy",
             MiniatureGalaxy::makeArchiveList,
         },
         {

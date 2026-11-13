@@ -2108,7 +2108,7 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/NameObj/NameObjArchiveListCollector.cpp"),
             Object(MatchingFor(ALL), "Game/NameObj/NameObjCategoryList.cpp"),
             Object(MatchingFor(ALL), "Game/NameObj/NameObjExecuteHolder.cpp"),
-            Object(MatchingFor(), "Game/NameObj/NameObjFactory.cpp"),
+            Object(MatchingFor(ALL), "Game/NameObj/NameObjFactory.cpp"),
             Object(MatchingFor(ALL), "Game/NameObj/NameObjFinder.cpp"),
             Object(MatchingFor(ALL), "Game/NameObj/NameObjGroup.cpp"),
             Object(MatchingFor(ALL), "Game/NameObj/NameObjHolder.cpp"),
