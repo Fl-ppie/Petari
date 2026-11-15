@@ -128,11 +128,14 @@ GameEventFlagStorage* GameEventFlagChecker::getChunk() {
 }
 
 bool GameEventFlagChecker::isOnGalaxy(const char* pGalaxyName) const {
-    if (mDataHolder->calcCurrentPowerStarNum() < GameDataConst::getPowerStarNumToOpenGalaxy(pGalaxyName)) {
-        return false;
-    }
+    // Archipelago
+    return mDataHolder->calcCurrentPowerStarNum() >= GameDataConst::getPowerStarNumToOpenGalaxy(pGalaxyName);
+    
+    // Archipelago: if (mDataHolder->calcCurrentPowerStarNum() < GameDataConst::getPowerStarNumToOpenGalaxy(pGalaxyName)) {
+    // Archipelago:     return false;
+    // Archipelago: }
 
-    return isOnGalaxyDepended(pGalaxyName);
+    // Archipelago: return isOnGalaxyDepended(pGalaxyName);
 }
 
 bool GameEventFlagChecker::isOnGalaxyDepended(const char* pGalaxyName) const {
