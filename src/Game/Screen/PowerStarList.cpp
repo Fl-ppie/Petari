@@ -1,4 +1,5 @@
 #include "Game/Screen/PowerStarList.hpp"
+#include "Archipelago/PatchHandler.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/Map/FileSelectFunc.hpp"
 #include "Game/Map/RaceManager.hpp"
@@ -17,8 +18,10 @@
 #include "Game/Util/MessageUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 #include "Game/Util/SceneUtil.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
+#include <revolution/os.h>
 #include <nw4r/lyt/drawInfo.h>
 #include <nw4r/lyt/pane.h>
 
@@ -144,7 +147,9 @@ namespace {
 
         for (; !iter.isEnd();) {
             GalaxyStatusAccessor accessor = iter.makeAccessor();
-            bool open = accessor.getPowerStarNum() == 0 ? false : MR::isOnGameEventFlagGalaxyOpen(accessor.getName());
+            bool open = accessor.getPowerStarNum() == 0 ? false :
+                                                          MR::isOnGameEventFlagGalaxyOpen(accessor.getName()) ||
+                                                              SingletonHolder< PatchHandler >::get()->getGalaxyUnlock(accessor.getName()) == 0;
 
             if (open) {
                 galaxyAccessors[availableGalaxies] = iter.makeAccessor();
@@ -152,6 +157,10 @@ namespace {
             }
 
             iter.goNext();
+        }
+
+        if (availableGalaxies == 0) {
+            OSPanic(__FILE__, __LINE__, "Something went wrong and there are no available galaxies.");
         }
 
         sortGalaxyAccessors(galaxyAccessors, galaxyAccessors + availableGalaxies);
