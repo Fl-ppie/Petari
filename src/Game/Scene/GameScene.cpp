@@ -1,4 +1,5 @@
 #include "Game/Scene/GameScene.hpp"
+#include "Archipelago/Deathlink.hpp"
 #include "Game/AudioLib/AudSceneMgr.hpp"
 #include "Game/AudioLib/AudWrap.hpp"
 #include "Game/LiveActor/AllLiveActorGroup.hpp"
@@ -35,6 +36,7 @@
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/ScreenUtil.hpp"
 #include "Game/Util/SequenceUtil.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
@@ -508,8 +510,9 @@ void GameScene::startStagePlayRetry() {
 }
 
 bool GameScene::isPermitToPauseMenu() const {
-    return !MR::isStageDisablePauseMenu() && isNerve(GET_NERVE(GameScene, GameSceneAction)) && !MR::isDemoActive() && !MR::isWipeActive() &&
-           !MR::isWipeBlank() && !MR::isPlayerDead() && !MR::isPlayerDamaging();
+    return !MR::isStageDisablePauseMenu() && mSpine != nullptr && mSpine->getCurrentNerve() != nullptr &&
+           isNerve(GET_NERVE(GameScene, GameSceneAction)) && !MR::isDemoActive() && !MR::isWipeActive() && !MR::isWipeBlank() &&
+           !MR::isPlayerDead() && !MR::isPlayerDamaging();
 }
 
 void GameScene::requestShowGalaxyMap() {
@@ -560,6 +563,10 @@ void GameScene::exeTimeUp() {
 }
 
 void GameScene::exeGameOver() {
+    if (MR::isFirstStep(this)) {
+        SingletonHolder< Deathlink >::get()->sendDeath();
+    }
+
     SceneFunction::movementStopSceneController();
     SceneFunction::executeMovementList();
 }
