@@ -1,11 +1,17 @@
 #include "Game/System/GameDataConst.hpp"
+#include "Archipelago/PatchHandler.hpp"
 #include "Game/System/GalaxyInfoTable.hpp"
 #include "Game/System/GameEventFlag.hpp"
 #include "Game/System/GameEventFlagTable.hpp"
 #include "Game/Util.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 #include <cstdio>
 
 s32 GameDataConst::getPowerStarNumToOpenGalaxy(const char* pGalaxyName) {
+    return SingletonHolder< PatchHandler >::get()->getGalaxyUnlock(pGalaxyName);
+
+    // Archipelago
+    /*
     JMapInfo info;
     info.attach(&cGalaxyInfoTable);
 
@@ -15,6 +21,7 @@ s32 GameDataConst::getPowerStarNumToOpenGalaxy(const char* pGalaxyName) {
     element.getValue< u32 >("PowerStarNum", &powerStarNum);
 
     return powerStarNum;
+    */
 }
 
 bool GameDataConst::isPowerStarGreen(const char* pGalaxyName, s32 starId) {
@@ -68,6 +75,9 @@ bool GameDataConst::isGalaxyAppearGreenDriver(const char* pGalaxyName) {
 }
 
 u32 GameDataConst::getIncludedGrandGalaxyId(const char* pGalaxyName) {
+    return SingletonHolder<PatchHandler>::get()->getReturnDome(pGalaxyName);
+    
+    /*
     JMapInfo info;
     info.attach(&cGalaxyInfoTable);
 
@@ -77,6 +87,7 @@ u32 GameDataConst::getIncludedGrandGalaxyId(const char* pGalaxyName) {
     element.getValue< u32 >("GrandGalaxyNo", &grandGalaxyNo);
 
     return grandGalaxyNo;
+    */
 }
 
 bool GameDataConst::isPowerStarSpecial(const char* pGalaxyName, s32 starId, const char* pSpecialStarName) {
