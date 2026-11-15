@@ -68,9 +68,11 @@ void NetworkHandler::recvPacket(APPacket* pPacket) {
             GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
             break;
         case StarType_GrandStar:
+            GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
             GameDataFunction::getArchipelagoStorage()->addGrandStarCount();
             break;
         case StarType_GreenStar:
+            GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
             GameDataFunction::getArchipelagoStorage()->addGreenStarCount();
             break;
         }
