@@ -83,4 +83,5 @@ public:
     // Archipelago
     /* 0x254 */ f32 mRadius;
     /* 0x258 */ f32 mAngle;
+    /* 0x25C */ const char* mOldGalaxyName;
 };

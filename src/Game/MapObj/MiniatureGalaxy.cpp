@@ -1,4 +1,5 @@
 #include "Game/MapObj/MiniatureGalaxy.hpp"
+#include "Archipelago/PatchHandler.hpp"
 #include "Game/LiveActor/MaterialCtrl.hpp"
 #include "Game/LiveActor/ModelObj.hpp"
 #include "Game/LiveActor/Nerve.hpp"
@@ -9,6 +10,7 @@
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/Screen/GalaxyNamePlate.hpp"
 #include "Game/System/GalaxyStatusAccessor.hpp"
+#include "Game/System/GameDataFunction.hpp"
 #include "Game/Util/CameraUtil.hpp"
 #include "Game/Util/DemoUtil.hpp"
 #include "Game/Util/EffectUtil.hpp"
@@ -20,6 +22,7 @@
 #include "Game/Util/ModelUtil.hpp"
 #include "Game/Util/MtxUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
@@ -63,6 +66,10 @@ namespace {
         MR::invalidateClipping(pObj);
         pObj->kill();
     }
+
+    PatchHandler* getPatchHandler() {
+        return SingletonHolder< PatchHandler >::get();
+    }
 };  // namespace
 
 namespace NrvMiniatureGalaxy {
@@ -76,21 +83,33 @@ namespace NrvMiniatureGalaxy {
 MiniatureGalaxy::MiniatureGalaxy(const char* pName)
     : LiveActor(pName), mType(-1), mState(MiniatureGalaxyState_Open), mUnknownModel(), mShadowModel(), mSelectModel(), mStarPlateModel(),
       mProjmapEffectMtxSetter(), mInitPos(gZeroVec), mObjectName(), mGalaxyName(), mCanZoomIn(1), mZoomLevel(::cZoomFrame), mOnesTexMtx(),
-      mTensTexMtx(), mOrbit(), mNamePlate() {
+      mTensTexMtx(), mOrbit(), mNamePlate(), mRadius(), mAngle(), mOldGalaxyName() {
     mShadowBaseMtx.identity();
     mPosMtx.identity();
 }
 
 void MiniatureGalaxy::init(const JMapInfoIter& rIter) {
-    MR::getObjectName(&mObjectName, rIter);
+    // Archipelago
+    const char* oldObjectName;
+    MR::getObjectName(&oldObjectName, rIter);
+
+    // Archipelago: MR::getObjectName(&mObjectName, rIter);
+
+    mObjectName = getPatchHandler()->getNewGalaxy(oldObjectName);
     mGalaxyName = ::getGalayNameFromObjectName(mObjectName);
 
     MR::initDefaultPos(this, rIter);
     mInitPos.set(mPosition);
 
-    s32 arg0 = -1;
-    MR::getJMapInfoArg0NoInit(rIter, &arg0);
-    mType = arg0;
+    // Archipelago:
+    mType = getPatchHandler()->getGalaxyType(oldObjectName);
+    mRadius = getPatchHandler()->getGalaxyOrbitRadius(oldObjectName);
+    mAngle = getPatchHandler()->getGalaxyAngle(oldObjectName);
+    mOldGalaxyName = ::getGalayNameFromObjectName(oldObjectName);
+
+    // Archipelago: s32 arg0 = -1;
+    // Archipelago: MR::getJMapInfoArg0NoInit(rIter, &arg0);
+    // Archipelago: mType = arg0;
 
     initModelManagerWithAnm(isUseKoopaFaceModel() ? "MiniKoopaGalaxy" : mObjectName, nullptr, false);
 
@@ -127,15 +146,6 @@ void MiniatureGalaxy::init(const JMapInfoIter& rIter) {
     MR::registerDemoSimpleCastAll(mNamePlate);
 
     makeActorDead();
-    
-    // Archipelago
-    f32 arg1 = 0.0f;
-    MR::getJMapInfoArg1NoInit(rIter, &arg1);
-    mRadius = arg1;
-
-    f32 arg2 = 0.0f;
-    MR::getJMapInfoArg2NoInit(rIter, &arg2);
-    mAngle = arg2;
 }
 
 void MiniatureGalaxy::initAfterPlacement() {
@@ -151,15 +161,26 @@ void MiniatureGalaxy::appear() {
     mZoomLevel = ::cZoomFrame;
     setScale(::cZoomOutScale);
 
-    if (!MR::isAppearGalaxy(mGalaxyName)) {
-        mState = MiniatureGalaxyState_Hatena;
-    } else if (MR::isOnGameEventFlagGalaxyOpen(mGalaxyName)) {
+    // Archipelago:
+    if (MR::isOnGameEventFlagGalaxyOpen(mOldGalaxyName)) {
         mState = MiniatureGalaxyState_Open;
-    } else if (MR::canOpenGalaxy(mGalaxyName)) {
+    } else if (MR::canOpenGalaxy(mOldGalaxyName)) {
         mState = MiniatureGalaxyState_New;
+    } else if (mType == MiniatureGalaxyType_Hatena) {
+        mState = MiniatureGalaxyState_Hatena;
     } else {
         mState = MiniatureGalaxyState_Unknown;
     }
+
+    // if (!MR::isAppearGalaxy(mGalaxyName)) {
+    //     mState = MiniatureGalaxyState_Hatena;
+    // } else if (MR::isOnGameEventFlagGalaxyOpen(mGalaxyName)) {
+    //     mState = MiniatureGalaxyState_Open;
+    // } else if (MR::canOpenGalaxy(mGalaxyName)) {
+    //     mState = MiniatureGalaxyState_New;
+    // } else {
+    //     mState = MiniatureGalaxyState_Unknown;
+    // }
 
     LiveActor::appear();
 
@@ -253,7 +274,8 @@ void MiniatureGalaxy::makeArchiveList(NameObjArchiveListCollector* pCollector, c
         }
 
         pCollector->addArchive(isUnknownKoopa ? "MiniKoopaGalaxy" : objectName);
-        // Archipelago: pCollector->addArchive(::isUseKoopaFaceModel(objectName, ::getGalayNameFromObjectName(objectName)) ? "MiniKoopaGalaxy" : objectName);
+        // Archipelago: pCollector->addArchive(::isUseKoopaFaceModel(objectName, ::getGalayNameFromObjectName(objectName)) ? "MiniKoopaGalaxy" :
+        // objectName);
         pCollector->addArchive("MiniatureGalaxyUnknownKoopa");
     }
 
@@ -383,7 +405,8 @@ void MiniatureGalaxy::initPartsModel() {
 
     mStarPlateModel = ::createGalaxyPart("スター数モデル", "MiniatureGalaxyStarNumber", mPosMtx, true);
 
-    s32 powerStarNum = MR::getPowerStarNumToOpenGalaxy(mGalaxyName);
+    s32 powerStarNum = MR::getPowerStarNumToOpenGalaxy(mOldGalaxyName);
+    // Archipelago: s32 powerStarNum = MR::getPowerStarNumToOpenGalaxy(mGalaxyName);
 
     if (powerStarNum < 10) {
         MR::initDLMakerTexMtx(mStarPlateModel, "StarNumber1")->setTexMtx(0, &mOnesTexMtx);
@@ -707,7 +730,8 @@ void MiniatureGalaxy::exeOpen() {
 
         disappearSelectModel();
 
-        MR::onGameEventFlagGalaxyOpen(mGalaxyName);
+        MR::onGameEventFlagGalaxyOpen(mOldGalaxyName);
+        // Archipelago: MR::onGameEventFlagGalaxyOpen(mGalaxyName);
         GalaxyStatusAccessor accessor = MR::makeGalaxyStatusAccessor(mGalaxyName);
 
         if (accessor.isExistGrandStar()) {
