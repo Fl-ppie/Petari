@@ -952,6 +952,11 @@ namespace {
             MR::StationedFileInfo::LOAD_TYPE_MOUNT_RESOURCE_LAYOUT,
             "/LayoutData/GameOver.arc",
         },
+        {
+            MR::StationedFileInfo::HEAP_TYPE_NAPA,
+            MR::StationedFileInfo::LOAD_TYPE_MOUNT_RESOURCE,
+            "/Archipelago/Patch.arc",
+        },
         {},
     };
 };  // namespace

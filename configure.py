@@ -2582,7 +2582,7 @@ config.libs = [
             Object(MatchingFor(ALL), "Game/System/ShapePacketUserData.cpp"),
             Object(MatchingFor(JPN, KOR), "Game/System/StarPointerOnOffController.cpp"),
             Object(MatchingFor(ALL), "Game/System/StationedArchiveLoader.cpp"),
-            Object(MatchingFor(KOR), "Game/System/StationedFileInfo.cpp"),
+            Object(MatchingFor(ALL), "Game/System/StationedFileInfo.cpp"),
             Object(MatchingFor(ALL), "Game/System/WPad.cpp"),
             Object(MatchingFor(), "Game/System/WPadAcceleration.cpp"),
             Object(MatchingFor(ALL), "Game/System/WPadButton.cpp"),
