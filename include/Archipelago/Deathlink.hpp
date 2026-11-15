@@ -2,7 +2,7 @@
 
 #include <revolution/types.h>
 
-#define DEATH_TIMEOUT 600
+#define DEATH_TIMEOUT 60 * 10
 
 class Deathlink {
 public:
