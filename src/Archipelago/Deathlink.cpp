@@ -7,6 +7,7 @@
 #include "Game/System/GameSystem.hpp"
 #include "Game/System/GameSystemSceneController.hpp"
 #include "Game/Util/PlayerUtil.hpp"
+#include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/StringUtil.hpp"
 
@@ -20,10 +21,9 @@ namespace {
         if (!MR::isEqualString(pSceneController->mCurrSceneControlInfo.mScene, "Game")) {
             return false;
         }
-        
+
         return const_cast< GameScene* >(reinterpret_cast< GameScene* >(pSceneController->mScene))->isPermitToPauseMenu();
     }
-
 };  // namespace
 
 Deathlink::Deathlink() : mDeathTimer(), mDeathBuffer() {
@@ -31,19 +31,21 @@ Deathlink::Deathlink() : mDeathTimer(), mDeathBuffer() {
 
 void Deathlink::update() {
     if (mDeathTimer == 0) {
-        if (mDeathBuffer > 0 && ::canPause() && MR::isExistMario() && ::canMarioMove()) {
+        if (mDeathBuffer == 0) {
+            return;
+        }
+
+        if (MR::isStageFileSelect() || (::canPause() && MR::isExistMario() && ::canMarioMove())) {
             MarioAccess::getPlayerActor()->forceGameOver();
 
             mDeathTimer = DEATH_TIMEOUT;
             mDeathBuffer--;
         }
-    } else {
-        mDeathTimer--;
+
+        return;
     }
 
-    if (mDeathTimer == 0 && mDeathBuffer == 0 && ::canPause() && MR::isExistMario() && MR::isPlayerConfrontDeath()) {
-        sendDeath();
-    }
+    mDeathTimer--;
 }
 
 void Deathlink::recvDeath() {
@@ -51,5 +53,5 @@ void Deathlink::recvDeath() {
 }
 
 void Deathlink::sendDeath() {
-    SingletonHolder< NetworkHandler >::get()->sendPacket(APPacket(PacketType_Deathlink, 0));
+    SingletonHolder< NetworkHandler >::get()->sendPacket(new DeathPacket());
 }
