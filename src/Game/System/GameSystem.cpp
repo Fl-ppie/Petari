@@ -1,4 +1,7 @@
 #include "Game/System/GameSystem.hpp"
+#include "Archipelago/Deathlink.hpp"
+#include "Archipelago/NetworkHandler.hpp"
+#include "Archipelago/PatchHandler.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/NameObj/NameObjRegister.hpp"
 #include "Game/Screen/HomeButtonLayout.hpp"
@@ -64,6 +67,16 @@ void main(void) {
     SingletonHolder< GameSystem >::get()->init();
 
     GameSystem* pGameSystem = SingletonHolder< GameSystem >::get();
+
+    // Archipelago
+    SingletonHolder< NetworkHandler >::init();
+    SingletonHolder< Deathlink >::init();
+    SingletonHolder< PatchHandler >::init();
+    SingletonHolder< PatchHandler >::get()->init();
+
+    u32 address = SingletonHolder< PatchHandler >::get()->getAddress();
+    u32 port = SingletonHolder< PatchHandler >::get()->getPort();
+    SingletonHolder< NetworkHandler >::get()->init(address, port);
 
     while (true) {
         pGameSystem->frameLoop();
@@ -195,6 +208,11 @@ void GameSystem::frameLoop() {
     draw();
     MainLoopFramework::sManager->endRender();
     update();
+
+    // Archipelago
+    SingletonHolder< NetworkHandler >::get()->update();
+    SingletonHolder< Deathlink >::get()->update();
+
     calcAnim();
     mObjHolder->captureIfAllowForScreenPreserver();
     MainLoopFramework::sManager->endFrame();

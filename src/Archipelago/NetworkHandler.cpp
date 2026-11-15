@@ -3,11 +3,22 @@
 #include "Archipelago/Deathlink.hpp"
 #include "Game/System/GameDataFunction.hpp"
 #include "Game/Util/SingletonHolder.hpp"
+#include <revolution/os.h>
 
 NetworkHandler::NetworkHandler() : mReconnectTimer(RECONNECT_TIMEOUT), mWrapper(), mSendQueue() {
 }
 
-void NetworkHandler::init(u8 ipv41, u8 ipv42, u8 ipv43, u8 ipv44, u32 port) {
+void NetworkHandler::init(u32 address, u16 port) {
+    u8* octets = reinterpret_cast< u8* >(&address);
+
+    if (address == 0 || port == 0) {
+        OSPanic(__FILE__, __LINE__, "Invalid address: %d.%d.%d.%d:%d", octets[0], octets[1], octets[2], octets[3], port);
+    }
+
+    init(octets[0], octets[1], octets[2], octets[3], port);
+}
+
+void NetworkHandler::init(u8 ipv41, u8 ipv42, u8 ipv43, u8 ipv44, u16 port) {
     mWrapper = new NetworkWrapper();
     mWrapper->init();
     mWrapper->setNonBlocking(true);

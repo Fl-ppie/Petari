@@ -1,12 +1,17 @@
 #include "Archipelago/PatchHandler.hpp"
 #include "Game/Util/ObjUtil.hpp"
 
-PatchHandler::PatchHandler() : mInfo() {
-    mInfo = new JMapInfo();
+namespace {
+    const char* sPatchFile = "Patch.arc";
+};
+
+PatchHandler::PatchHandler() : mPatchInfo(), mNetworkInfo() {
+    mPatchInfo = new JMapInfo();
 }
 
 void PatchHandler::init() {
-    mInfo->attach(MR::loadResourceFromArc("Patch.arc", "Patch.bcsv"));
+    mPatchInfo->attach(MR::loadResourceFromArc(::sPatchFile, "Patch.bcsv"));
+    mNetworkInfo->attach(MR::loadResourceFromArc(::sPatchFile, "Network.bcsv"));
 }
 
 const char* PatchHandler::getNewGalaxy(const char* pGalaxyName) {
@@ -58,6 +63,24 @@ u32 PatchHandler::getReturnDome(const char* pNewGalaxyName) {
     s32 returnDome = 0;
     if (getNewIter(pNewGalaxyName).getValue("dome", &returnDome)) {
         return returnDome;
+    }
+
+    return 0;
+}
+
+u32 PatchHandler::getAddress() {
+    u32 address;
+    if (mNetworkInfo->getValue(0, "address", &address)) {
+        return address;
+    }
+
+    return 0;
+}
+
+u32 PatchHandler::getPort() {
+    u32 port;
+    if (mNetworkInfo->getValue(0, "address", &port)) {
+        return port;
     }
 
     return 0;
