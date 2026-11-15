@@ -68,6 +68,11 @@ void AstroDomeOrbit::drawBloom() const {
 void AstroDomeOrbit::setup(f32 radius, f32 angle) {
     mOrbitRadius = radius;
     mAngle = angle;
+
+    if (mOrbitRadius > 10000.0f) {
+        mRotation.set(::cRotateOutermost);
+    }
+
     // Archipelago: s32 miniNum = MiniatureGalaxyFunction::getMiniatureGalaxyNum();
     // Archipelago: const f32* radii = ::cRadiusLastDome;
 
