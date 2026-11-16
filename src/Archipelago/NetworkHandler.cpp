@@ -1,11 +1,21 @@
 #include "Archipelago/NetworkHandler.hpp"
 #include "Archipelago/ArchipelagoStorage.hpp"
 #include "Archipelago/Deathlink.hpp"
+#include "Archipelago/NetworkWrapper.hpp"
 #include "Game/System/GameDataFunction.hpp"
+#include "Game/Util/MemoryUtil.hpp"
 #include "Game/Util/SingletonHolder.hpp"
-#include <revolution/os.h>
+
+namespace {
+    void printPacketData(APPacket* pPacket) {
+        for (s32 i = 0; i < pPacket->mSize; i++) {
+            OSReport("%02X", *(reinterpret_cast< u8* >(pPacket) + i));
+        }
+    }
+};  // namespace
 
 NetworkHandler::NetworkHandler() : mReconnectTimer(RECONNECT_TIMEOUT), mWrapper(), mSendQueue() {
+    mSendQueue.init(32);
 }
 
 void NetworkHandler::init(u32 address, u16 port) {
@@ -24,6 +34,9 @@ void NetworkHandler::init(u8 ipv41, u8 ipv42, u8 ipv43, u8 ipv44, u16 port) {
     mWrapper->setNonBlocking(true);
 
     mWrapper->mAddress = new SocketAddress(AF_INET, port, ipv41, ipv42, ipv43, ipv44);
+
+    OSReport("Starting connection...\n");
+
     mWrapper->connect();
 }
 
@@ -35,24 +48,44 @@ void NetworkHandler::update() {
     IOSError poll = mWrapper->poll();
 
     if (poll < 0) {
+        OSReport("Network not initialised.\n");
         return;
-    } else if (poll != POLL_ERR) {
+    } else if (poll & POLL_UNK1 || poll & POLL_UNK2) {
         reconnect();
         return;
     }
 
-    u8 recvbuf[512];
-    mWrapper->recv(&recvbuf, sizeof(APPacket));
+    if (!mWrapper->mIsConnected) {
+        OSReport("Connected!\n");
+    }
 
-    APPacket* packet = reinterpret_cast< APPacket* >(&recvbuf);
-    if (packet->mType != PacketType_NULL) {
-        mWrapper->recv(packet + 1, packet->mSize - sizeof(APPacket));
-        recvPacket(packet);
+    mWrapper->mIsConnected = true;
+
+    if (poll & POLL_IN) {
+        u8 recvbuf[32];
+        MR::zeroMemory(&recvbuf, sizeof(recvbuf));
+        mWrapper->recv(&recvbuf, sizeof(APPacket));
+
+        APPacket* packet = reinterpret_cast< APPacket* >(&recvbuf);
+        if (packet->mType != PacketType_NULL) {
+            mWrapper->recv(packet + 1, packet->mSize - sizeof(APPacket));
+
+            OSReport("Received packet data: ");
+            ::printPacketData(packet);
+            OSReport("\n");
+
+            recvPacket(packet);
+        }
     }
 
     if (mSendQueue.size() != 0) {
-        for (APPacket* packet = *mSendQueue.begin(); packet != *mSendQueue.end(); packet++) {
-            mWrapper->send(packet, packet->mSize);
+        for (APPacket** packet = mSendQueue.begin(); packet != mSendQueue.end(); packet++) {
+            mWrapper->send(*packet, (*packet)->mSize);
+
+            OSReport("Sent packet data: ");
+            ::printPacketData(*packet);
+            OSReport("\n");
+
             delete packet;
         }
 
@@ -65,25 +98,31 @@ void NetworkHandler::recvPacket(APPacket* pPacket) {
     case PacketType_Star:
         switch (static_cast< StarPacket* >(pPacket)->mStarType) {
         case StarType_PowerStar:
+            OSReport("Received Powerstar!\n");
             GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
             break;
         case StarType_GrandStar:
+            OSReport("Received Grandstar!\n");
             GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
             GameDataFunction::getArchipelagoStorage()->addGrandStarCount();
             break;
         case StarType_GreenStar:
+            OSReport("Received Greenstar!\n");
             GameDataFunction::getArchipelagoStorage()->addPowerStarCount();
             GameDataFunction::getArchipelagoStorage()->addGreenStarCount();
             break;
         }
         break;
     case PacketType_Deathlink:
+        OSReport("Received deathlink :-(\n");
         SingletonHolder< Deathlink >::get()->recvDeath();
         break;
     case PacketType_Lives:
+        OSReport("Received a life! :-)\n");
         GameDataFunction::addPlayerLeft(1);
         break;
     default:
+        OSReport("Unknown packet :/\n");
         break;
     }
 }

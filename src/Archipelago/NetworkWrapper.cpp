@@ -1,7 +1,7 @@
 #include "Archipelago/NetworkWrapper.hpp"
 #include <cstring>
 
-NetworkWrapper::NetworkWrapper() : mDeviceFd(-1), mSocketFd(-1), mAddress() {
+NetworkWrapper::NetworkWrapper() : mDeviceFd(-1), mSocketFd(-1), mAddress(), mIsConnected() {
 }
 
 void NetworkWrapper::init() {

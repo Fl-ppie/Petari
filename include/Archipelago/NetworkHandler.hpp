@@ -48,8 +48,21 @@ public:
             return IOS_ERROR_NOTREADY;
         }
 
+        if (mWrapper->mIsConnected) {
+            u32 address = mWrapper->mAddress->mAddress;
+            u16 port = mWrapper->mAddress->mPort;
+            
+            delete mWrapper;
+
+            OSReport("Disconnected.\n");
+
+            init(address, port);
+        }
+
         mReconnectTimer = RECONNECT_TIMEOUT;
 
+        OSReport("Attempting to connect...\n");
+        
         return mWrapper->connect();
     }
 

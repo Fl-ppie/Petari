@@ -46,6 +46,8 @@ enum PollState {
     POLL_OUT = 0x4,
     POLL_ERR = 0x8,
     POLL_HUP = 0x10,
+    POLL_UNK1 = 0x20,
+    POLL_UNK2 = 0x40,
 };
 
 struct SocketAddress {
@@ -90,4 +92,5 @@ public:
     /* 0x04 */ IOSFd mDeviceFd;
     /* 0x08 */ IOSFd mSocketFd;
     /* 0x0C */ SocketAddress* mAddress;
+    /* 0x10 */ bool mIsConnected;
 };
