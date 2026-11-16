@@ -7,6 +7,7 @@ namespace {
 
 PatchHandler::PatchHandler() : mPatchInfo(), mNetworkInfo() {
     mPatchInfo = new JMapInfo();
+    mNetworkInfo = new JMapInfo();
 }
 
 void PatchHandler::init() {
@@ -79,7 +80,7 @@ u32 PatchHandler::getAddress() {
 
 u32 PatchHandler::getPort() {
     u32 port;
-    if (mNetworkInfo->getValue(0, "address", &port)) {
+    if (mNetworkInfo->getValue(0, "port", &port)) {
         return port;
     }
 
