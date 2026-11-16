@@ -1,4 +1,6 @@
 #include "Game/Scene/LogoScene.hpp"
+#include "Archipelago/NetworkHandler.hpp"
+#include "Archipelago/PatchHandler.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/Scene/SceneObjHolder.hpp"
@@ -12,6 +14,7 @@
 #include "Game/Util/LayoutUtil.hpp"
 #include "Game/Util/NerveUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
+#include "Game/Util/SingletonHolder.hpp"
 
 #if (VERSION == RMGK01)
 #include "Game/Screen/IsbnManager.hpp"
@@ -228,6 +231,13 @@ void LogoScene::exeWaitReadDoneSystemArchive() {
 void LogoScene::exeDeactive() {
     if (MR::isFirstStep(this)) {
         GameSequenceFunction::notifyToGameSequenceProgressToEndScene();
+
+        // Archipelago
+        SingletonHolder< PatchHandler >::get()->init();
+
+        u32 address = SingletonHolder< PatchHandler >::get()->getAddress();
+        u32 port = SingletonHolder< PatchHandler >::get()->getPort();
+        SingletonHolder< NetworkHandler >::get()->init(address, port);
     }
 }
 

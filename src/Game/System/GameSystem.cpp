@@ -72,11 +72,6 @@ void main(void) {
     SingletonHolder< NetworkHandler >::init();
     SingletonHolder< Deathlink >::init();
     SingletonHolder< PatchHandler >::init();
-    SingletonHolder< PatchHandler >::get()->init();
-
-    u32 address = SingletonHolder< PatchHandler >::get()->getAddress();
-    u32 port = SingletonHolder< PatchHandler >::get()->getPort();
-    SingletonHolder< NetworkHandler >::get()->init(address, port);
 
     while (true) {
         pGameSystem->frameLoop();
